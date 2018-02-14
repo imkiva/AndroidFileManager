@@ -12,5 +12,25 @@ public class ParseResult {
     public String mTime;
     public String mName;
     public String mSymbolLinkName;
-    public boolean isDirectory;
+    public FileType mType;
+
+    @Override
+    public String toString() {
+        return "ParseResult [" +
+                "name: " +
+                mName +
+                ", type: " +
+                mType.getName() +
+                ", group: " +
+                mGroup +
+                ", owner: " +
+                mOwner +
+                ", size: " +
+                mSize +
+                ", permission: " +
+                mPermission +
+                ", symbol link: " +
+                mSymbolLinkName +
+                "]";
+    }
 }

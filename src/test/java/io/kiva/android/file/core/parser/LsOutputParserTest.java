@@ -1,5 +1,6 @@
 package io.kiva.android.file.core.parser;
 
+import io.kiva.android.file.core.process.ProcessOutput;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -80,18 +81,11 @@ public class LsOutputParserTest {
 
     @Test
     public void parse() {
-        Pattern pattern = LsOutputParser.PATTERN;
-
+        LsOutputParser parser = new LsOutputParser();
         Arrays.stream(TEXT)
-                .forEach(it -> {
-                    System.out.println(it);
-                    Matcher matcher = pattern.matcher(it);
-                    assertTrue(matcher.matches());
-                    for (int i = 0; i < matcher.groupCount(); ++i) {
-                        String s = matcher.group(i);
-                        System.out.println("Group #" + i + "\t: " + s);
-                    }
-                });
+                .map(ProcessOutput::new)
+                .map(parser::parse)
+                .forEach(System.out::println);
     }
 
     @Test

@@ -7,7 +7,7 @@ package io.kiva.android.file.core.process;
 public class ProcessOutput {
     private String mLine;
 
-    ProcessOutput(String line) {
+    public ProcessOutput(String line) {
         this.mLine = line;
     }
 

@@ -1,5 +1,6 @@
 package io.kiva.android.file.core.model;
 
+import io.kiva.android.file.core.parser.FileType;
 import io.kiva.android.file.core.parser.ParseResult;
 
 /**
@@ -14,7 +15,7 @@ public class FileModel {
     }
 
     public boolean isDirectory() {
-        return mParseResult.isDirectory;
+        return mParseResult.mType == FileType.DIRECTORY;
     }
 
     public String getPermission() {

@@ -1,5 +1,6 @@
 package io.kiva.android.file.core.model;
 
+import io.kiva.android.file.core.parser.FileType;
 import io.kiva.android.file.core.parser.IOutputParser;
 import io.kiva.android.file.core.parser.ParseResult;
 import io.kiva.android.file.core.process.ProcessOutput;
@@ -21,7 +22,7 @@ public class ModelFactory {
             return null;
         }
         FileModel model;
-        if (result.isDirectory) {
+        if (result.mType == FileType.DIRECTORY) {
             model = new DirectoryModel(result);
         } else {
             model = new FileModel(result);
