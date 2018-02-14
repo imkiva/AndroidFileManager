@@ -10,8 +10,6 @@ import java.io.IOException;
  */
 public class ShellProcess implements AutoCloseable, OutputListener {
     private static final long WAIT_TIMEOUT = 160L;
-    private static final int KILLED_BY_SIGNAL_START = 128 + 1;
-    private static final int KILLED_BY_SIGNAL_END = 128 + 64;
 
     private Process mProcess;
     private ReaderThread mReaderThread;
@@ -56,18 +54,6 @@ public class ShellProcess implements AutoCloseable, OutputListener {
         this.mWaitTimeout = mWaitTimeout;
     }
 
-    public boolean isKilledBySignal() {
-        int code = getExitCode();
-        return code >= KILLED_BY_SIGNAL_START && code <= KILLED_BY_SIGNAL_END;
-    }
-
-    public int getKillingSignal() {
-        if (isKilledBySignal()) {
-            return getExitCode() - 128;
-        }
-        return -1;
-    }
-
     @Override
     public void close() {
         if (!mClosed) {
@@ -83,8 +69,7 @@ public class ShellProcess implements AutoCloseable, OutputListener {
                 waitForExit();
             }
             mExitCode = mProcess.exitValue();
-            Log.d("Shell closed ---- exited with " + mExitCode
-                    + (isKilledBySignal() ? ", killed by signal " + getKillingSignal() : ""));
+            Log.d("Shell closed ---- exited with " + mExitCode);
         }
     }
 
