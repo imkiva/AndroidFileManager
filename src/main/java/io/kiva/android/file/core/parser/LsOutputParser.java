@@ -10,15 +10,14 @@ import java.util.regex.Pattern;
  */
 public class LsOutputParser implements IOutputParser {
     public static final Pattern PATTERN = Pattern.compile(
-            "[dlspbc-][rwxtsSX-]{9}\\s*" + // permission
-                    "[a-zA-Z0-9_]+\\s*" + // group
-                    "[a-zA-Z0-9_]+\\s*" + // owner
+            "([dlspbc-][rwxtsSX-]{9})\\s*" + // permission
+                    "([a-zA-Z0-9_]+)\\s*" + // group
+                    "([a-zA-Z0-9_]+)\\s*" + // owner
                     "([0-9]*\\s*)?" + // size
-                    "[1-9][0-9]+-[0-9]+-[0-9]+\\s*" + // year
-                    "[0-9]{2}:[0-9]{2}\\s*" + // hour:min
-                    "([^<>/\\\\|:\"\"*?]+(\\.\\w+)?)\\s*" + // name
+                    "(((19|20)[0-9]{2})-(0?[1-9]|1[012])-(0?[1-9]|[12][0-9]|3[01])\\s*([01]?[0-9]|2[0-3]):[0-5][0-9])\\s*" + // time
+                    "([^<>/\\\\|:\"*?]+(\\.\\w+)?)\\s*" + // name
                     "(->\\s*" +
-                    "(([^<>/\\\\|:\"\"*?]|[/])+(\\.\\w+)?)" + // symbol link name
+                    "(([^<>/\\\\|:\"*?]|[/])+(\\.\\w+)?)" + // symbol link name
                     ")?"
     );
 
