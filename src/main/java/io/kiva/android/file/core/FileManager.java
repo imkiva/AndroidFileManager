@@ -2,8 +2,6 @@ package io.kiva.android.file.core;
 
 import io.kiva.android.file.core.utils.SystemProperty;
 
-import java.security.AccessController;
-
 /**
  * @author kiva
  * @date 2018/2/14
