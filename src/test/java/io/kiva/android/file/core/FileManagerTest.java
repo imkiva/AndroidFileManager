@@ -12,6 +12,6 @@ public class FileManagerTest {
     @Test
     public void mainDir() {
         FileManager manager = new FileManager("/storage/sdcard0");
-        assertEquals("/storage/sdcard0/", manager.getDirectoryStack().join());
+        assertEquals("/storage/sdcard0/", manager.getNavigator().getCurrentPath());
     }
 }
