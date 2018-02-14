@@ -1,6 +1,7 @@
 package io.kiva.android.file.core.parser;
 
 import io.kiva.android.file.core.process.ProcessOutput;
+import io.kiva.android.file.core.utils.Log;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -37,6 +38,7 @@ public class LsOutputParser implements IOutputParser {
         String line = processOutput.getLine();
         Matcher matcher = PATTERN.matcher(line);
         if (!matcher.matches()) {
+            Log.e("Cannot match output: " + line);
             return null;
         }
 

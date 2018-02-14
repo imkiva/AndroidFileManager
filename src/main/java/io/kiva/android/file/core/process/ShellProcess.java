@@ -9,7 +9,7 @@ import java.io.IOException;
  * @date 2018/2/14
  */
 public class ShellProcess implements AutoCloseable, OutputListener {
-    public static final int WAIT_TIMEOUT = 160;
+    private static final long WAIT_TIMEOUT = 160L;
     private static final int KILLED_BY_SIGNAL_START = 128 + 1;
     private static final int KILLED_BY_SIGNAL_END = 128 + 64;
 
@@ -17,17 +17,17 @@ public class ShellProcess implements AutoCloseable, OutputListener {
     private ReaderThread mReaderThread;
     private CommandWriter mCommandWriter;
     private OutputListener mListener;
-    private boolean mClosed;
-    private int mExitCode;
-    private boolean mSafeExit;
+
+    private boolean mClosed = false;
+    private int mExitCode = -1;
+    private boolean mSafeExit = false;
+    private long mWaitTimeout = WAIT_TIMEOUT;
 
     private ShellProcess(Process process) {
         this.mProcess = process;
         this.mReaderThread = new ReaderThread(process.getInputStream(), this);
         this.mReaderThread.start();
         this.mCommandWriter = new CommandWriter(process.getOutputStream());
-        this.mClosed = false;
-        this.mSafeExit = false;
 
         Log.d("Shell started ---- waiting for commands");
     }
@@ -41,15 +41,19 @@ public class ShellProcess implements AutoCloseable, OutputListener {
 
     private void doSafeExit() {
         mCommandWriter.addCommand("exit 0");
-        mReaderThread.stopSelf();
+        mReaderThread.stopSelf(mWaitTimeout);
     }
 
     private void waitForExit() {
         try {
             // Let shell exit
-            Thread.sleep(WAIT_TIMEOUT);
+            Thread.sleep(mWaitTimeout);
         } catch (InterruptedException ignore) {
         }
+    }
+
+    public void setWaitTimeout(long mWaitTimeout) {
+        this.mWaitTimeout = mWaitTimeout;
     }
 
     public boolean isKilledBySignal() {
@@ -73,7 +77,7 @@ public class ShellProcess implements AutoCloseable, OutputListener {
             }
 
             mProcess.destroy();
-            mReaderThread.stopSelf();
+            mReaderThread.stopSelf(mWaitTimeout);
 
             if (mProcess.isAlive()) {
                 waitForExit();
@@ -106,12 +110,7 @@ public class ShellProcess implements AutoCloseable, OutputListener {
         }
     }
 
-    public static ShellProcess open() {
-        String shell = ShellHelper.detectShell();
-        if (shell == null) {
-            throw new UnsupportedOperationException("Failed to detect shell");
-        }
-
+    public static ShellProcess open(String shell) {
         ProcessBuilder builder = new ProcessBuilder(shell);
         builder.redirectErrorStream(true);
         try {
@@ -120,5 +119,14 @@ public class ShellProcess implements AutoCloseable, OutputListener {
         } catch (IOException e) {
             throw new RuntimeException("Failed to start shell process", e);
         }
+    }
+
+    public static ShellProcess open() {
+        String shell = ShellHelper.detectShell();
+        if (shell == null) {
+            throw new UnsupportedOperationException("Failed to detect shell");
+        }
+
+        return open(shell);
     }
 }

@@ -15,11 +15,11 @@ class OperationThread extends Thread {
         return isRunning;
     }
     
-    public void stopSelf() {
+    public void stopSelf(long waitTimeout) {
         if (isAlive()) {
             setRunning(false);
             try {
-                join(ShellProcess.WAIT_TIMEOUT);
+                join(waitTimeout);
             } catch (InterruptedException ignore) {
             }
         }

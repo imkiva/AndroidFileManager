@@ -45,4 +45,9 @@ public class FileModel {
     public String getSymbolLinkName() {
         return mParseResult.mSymbolLinkName;
     }
+
+    @Override
+    public String toString() {
+        return mParseResult.toString();
+    }
 }
