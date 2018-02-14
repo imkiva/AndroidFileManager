@@ -45,8 +45,7 @@ public final class Log {
 
     private static void log(PrintStream printStream, String logType, String message) {
         if (LOG_ENABLED) {
-            printStream.print(getCallerHeader(logType));
-            printStream.println(message);
+            printStream.println(getCallerHeader(logType) + message);
         }
     }
 
