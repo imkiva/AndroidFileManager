@@ -1,7 +1,5 @@
 package io.kiva.android.file;
 
-import io.kiva.android.file.core.FileManager;
-
 /**
  * @author kiva
  * @date 2018/2/14
