@@ -32,7 +32,6 @@ final class ReaderThread extends OperationThread {
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(mInputStream))) {
             while (isRunning()) {
                 try {
-                    Log.d("ReaderThread ---- waiting for pending output");
                     while ((line = reader.readLine()) != null) {
                         output = new ProcessOutput(line);
                         mListener.onNewOutput(output);

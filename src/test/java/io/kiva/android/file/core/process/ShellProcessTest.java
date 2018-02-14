@@ -24,7 +24,7 @@ public class ShellProcessTest {
             case BSD:
             case AIX:
             case LINUX:
-                shellProcess.writeCommand("adb shell ls -l /sdcard/");
+                shellProcess.writeCommand("ls -l /");
                 break;
         }
         shellProcess.close();

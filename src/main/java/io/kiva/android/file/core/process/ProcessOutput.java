@@ -5,9 +5,9 @@ package io.kiva.android.file.core.process;
  * @date 2018/2/14
  */
 public class ProcessOutput {
-    String mLine;
+    private String mLine;
 
-    public ProcessOutput(String line) {
+    ProcessOutput(String line) {
         this.mLine = line;
     }
 
@@ -17,6 +17,6 @@ public class ProcessOutput {
 
     @Override
     public String toString() {
-        return "OOOO -> " + getLine();
+        return getLine();
     }
 }
