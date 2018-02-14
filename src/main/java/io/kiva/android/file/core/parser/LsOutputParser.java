@@ -13,13 +13,13 @@ import static io.kiva.android.file.core.parser.FileType.*;
  * @date 2018/2/14
  */
 public class LsOutputParser implements IOutputParser {
-    public static final int GROUP_PERMISSION = 1;
-    public static final int GROUP_GROUP = 2;
-    public static final int GROUP_OWNER = 3;
-    public static final int GROUP_SIZE = 4;
-    public static final int GROUP_TIME = 5;
-    public static final int GROUP_NAME = 11;
-    public static final int GROUP_SYMBOL_LINK = 14;
+    private static final int GROUP_PERMISSION = 1;
+    private static final int GROUP_GROUP = 2;
+    private static final int GROUP_OWNER = 3;
+    private static final int GROUP_SIZE = 4;
+    private static final int GROUP_TIME = 5;
+    private static final int GROUP_NAME = 11;
+    private static final int GROUP_SYMBOL_LINK = 14;
 
     public static final Pattern PATTERN = Pattern.compile(
             "([dlspbc-][rwxtsSX-]{9})\\s*" + // permission
