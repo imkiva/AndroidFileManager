@@ -1,5 +1,7 @@
 package io.kiva.android.file.core.process;
 
+import io.kiva.android.file.core.utils.SystemProperty;
+
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 
@@ -19,9 +21,7 @@ public enum Platform {
     WINDOWS;
 
     static Platform get() {
-        String osName = AccessController.doPrivileged(
-                (PrivilegedAction<String>) () -> System.getProperty("os.name")
-        );
+        String osName = SystemProperty.get("os.name");
 
         if (osName.equals("Linux")) {
             return LINUX;

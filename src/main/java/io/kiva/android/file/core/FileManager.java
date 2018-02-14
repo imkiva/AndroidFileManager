@@ -1,6 +1,8 @@
 package io.kiva.android.file.core;
 
-import java.util.Stack;
+import io.kiva.android.file.core.utils.SystemProperty;
+
+import java.security.AccessController;
 
 /**
  * @author kiva
@@ -9,13 +11,20 @@ import java.util.Stack;
 public class FileManager {
     private static final String USER_DIR_PROPERTY = "user.dir";
 
-    private final Stack<String> mDirs = new Stack<>();
+    private final DirectoryStack mDirectoryStack = new DirectoryStack();
 
     public FileManager() {
-        this(System.getProperty(USER_DIR_PROPERTY));
+        this(SystemProperty.get(USER_DIR_PROPERTY));
     }
 
-    public FileManager(String mainDirectory) {
-        mDirs.push(mainDirectory);
+    public FileManager(String mainDir) {
+        FilePathHelper.splitPath(mainDir)
+                .stream()
+                .filter(s -> !s.isEmpty())
+                .forEach(mDirectoryStack::push);
+    }
+
+    public DirectoryStack getDirectoryStack() {
+        return mDirectoryStack;
     }
 }
