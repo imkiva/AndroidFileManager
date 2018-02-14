@@ -14,4 +14,9 @@ public class ProcessOutput {
     public String getLine() {
         return mLine;
     }
+
+    @Override
+    public String toString() {
+        return "OOOO -> " + getLine();
+    }
 }

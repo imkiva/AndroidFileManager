@@ -3,6 +3,10 @@ package io.kiva.android.file.core.process;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 
+/**
+ * @author kiva
+ * @date 2018/2/14
+ */
 public enum Platform {
     LINUX,
 
