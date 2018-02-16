@@ -1,5 +1,7 @@
 package io.kiva.android.file.core.process;
 
+import io.kiva.android.file.core.utils.Platform;
+
 /**
  * @author kiva
  * @date 2018/2/14

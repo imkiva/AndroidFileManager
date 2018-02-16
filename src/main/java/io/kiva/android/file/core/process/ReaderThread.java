@@ -10,10 +10,10 @@ import java.io.InputStreamReader;
  * @date 2018/2/14
  */
 final class ReaderThread extends OperationThread {
-    private OutputListener mListener;
+    private IOutputListener mListener;
     private InputStream mInputStream;
 
-    ReaderThread(InputStream inputStream, OutputListener mListener) {
+    ReaderThread(InputStream inputStream, IOutputListener mListener) {
         this.mInputStream = inputStream;
         this.mListener = mListener;
         this.setName("ReaderThread");

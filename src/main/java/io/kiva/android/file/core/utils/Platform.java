@@ -1,9 +1,4 @@
-package io.kiva.android.file.core.process;
-
-import io.kiva.android.file.core.utils.SystemProperty;
-
-import java.security.AccessController;
-import java.security.PrivilegedAction;
+package io.kiva.android.file.core.utils;
 
 /**
  * @author kiva
@@ -20,7 +15,7 @@ public enum Platform {
 
     WINDOWS;
 
-    static Platform get() {
+    public static Platform get() {
         String osName = SystemProperty.get("os.name");
 
         if (osName.equals("Linux")) {

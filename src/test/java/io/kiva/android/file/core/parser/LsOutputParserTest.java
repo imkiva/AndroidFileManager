@@ -1,10 +1,10 @@
 package io.kiva.android.file.core.parser;
 
+import io.kiva.android.file.core.parser.impl.LsOutputParser;
 import io.kiva.android.file.core.process.ProcessOutput;
 import org.junit.Test;
 
 import java.util.Arrays;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static org.junit.Assert.assertTrue;

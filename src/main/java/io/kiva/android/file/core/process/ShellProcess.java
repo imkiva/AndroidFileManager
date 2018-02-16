@@ -8,13 +8,13 @@ import java.io.IOException;
  * @author kiva
  * @date 2018/2/14
  */
-public class ShellProcess implements AutoCloseable, OutputListener {
+public class ShellProcess implements AutoCloseable, IOutputListener {
     private static final long WAIT_TIMEOUT = 160L;
 
     private Process mProcess;
     private ReaderThread mReaderThread;
     private CommandWriter mCommandWriter;
-    private OutputListener mListener;
+    private IOutputListener mListener;
 
     private boolean mClosed = false;
     private int mExitCode = -1;
@@ -84,7 +84,7 @@ public class ShellProcess implements AutoCloseable, OutputListener {
         this.mSafeExit = mSafeExit;
     }
 
-    public void setOutputListener(OutputListener mListener) {
+    public void setOutputListener(IOutputListener mListener) {
         this.mListener = mListener;
     }
 

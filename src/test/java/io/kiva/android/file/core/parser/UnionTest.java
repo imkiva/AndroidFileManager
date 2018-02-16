@@ -2,6 +2,7 @@ package io.kiva.android.file.core.parser;
 
 import io.kiva.android.file.core.model.FileModel;
 import io.kiva.android.file.core.model.ModelFactory;
+import io.kiva.android.file.core.parser.impl.LsOutputParser;
 import io.kiva.android.file.core.process.ShellProcess;
 import org.junit.Test;
 

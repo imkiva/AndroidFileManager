@@ -1,5 +1,6 @@
 package io.kiva.android.file.core.process;
 
+import io.kiva.android.file.core.utils.Platform;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
