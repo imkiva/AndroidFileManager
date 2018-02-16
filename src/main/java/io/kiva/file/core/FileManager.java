@@ -8,7 +8,9 @@ import io.kiva.process.IOutputListener;
 import io.kiva.process.ProcessOutput;
 import io.kiva.process.ShellProcess;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -18,6 +20,20 @@ import java.util.List;
 public class FileManager implements OnDirectoryChangedListener, IOutputListener {
     private static final String COMMAND_END = "----AFM---COMMAND-END----";
     private static final ModelFactory FACTORY = ModelFactory.create();
+    private static final Comparator<FileModel> COMPARATOR = (lhs, rhs) -> {
+        boolean lhsIsDir = lhs.isDirectory();
+        boolean rhsIsDir = rhs.isDirectory();
+        if (lhsIsDir && !rhsIsDir) {
+            return -1;
+        } else if (!lhsIsDir && rhsIsDir) {
+            return 1;
+        } else if (lhsIsDir) {
+            return lhs.getName().toLowerCase()
+                    .compareTo(rhs.getName().toLowerCase());
+        } else {
+            return lhs.getName().compareTo(rhs.getName());
+        }
+    };
 
     private final ArrayList<OnCacheUpdatedListener> mListeners = new ArrayList<>();
     private final DirectoryNavigator mDirectoryNavigator = new DirectoryNavigator();
@@ -69,6 +85,7 @@ public class FileManager implements OnDirectoryChangedListener, IOutputListener 
         Log.i("-> " + output.getLine());
         if (output.getLine().equals(COMMAND_END)) {
             Log.d("Cache for " + mLoadingPath + " updated");
+            mLoading.sort(COMPARATOR);
             mCache.update(mLoadingPath, mLoading);
             notifyChangeUpdated(mLoadingPath, mLoading);
             mLoadingPath = null;
