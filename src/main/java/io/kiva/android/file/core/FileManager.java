@@ -6,6 +6,7 @@ import io.kiva.android.file.core.parser.impl.LsOutputParser;
 import io.kiva.android.file.core.process.IOutputListener;
 import io.kiva.android.file.core.process.ProcessOutput;
 import io.kiva.android.file.core.process.ShellProcess;
+import io.kiva.android.file.core.utils.FileHelper;
 import io.kiva.android.file.core.utils.Platform;
 import io.kiva.android.file.core.utils.SystemProperty;
 
@@ -34,6 +35,7 @@ public class FileManager implements OnDirectoryChangedListener, IOutputListener 
     }
 
     private final DirectoryNavigator mDirectoryNavigator;
+    private final DirectoryCache mCache;
     private final ShellProcess mShell;
 
     public FileManager() {
@@ -44,6 +46,7 @@ public class FileManager implements OnDirectoryChangedListener, IOutputListener 
         mDirectoryNavigator = new DirectoryNavigator();
         mDirectoryNavigator.navigate(mainDir);
         mDirectoryNavigator.addOnDirectoryChangedListener(this);
+        mCache = new DirectoryCache();
         mShell = ShellProcess.open();
         mShell.setOutputListener(this);
     }

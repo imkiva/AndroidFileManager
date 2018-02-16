@@ -1,5 +1,7 @@
 package io.kiva.android.file.core;
 
+import io.kiva.android.file.core.utils.FileHelper;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;

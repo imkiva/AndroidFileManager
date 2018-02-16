@@ -1,4 +1,4 @@
-package io.kiva.android.file.core;
+package io.kiva.android.file.core.utils;
 
 import java.io.File;
 import java.util.Arrays;
@@ -8,13 +8,13 @@ import java.util.List;
  * @author kiva
  * @date 2018/2/14
  */
-final class FileHelper {
+public final class FileHelper {
     private static final String CHARS_ESCAPE = "\"\\$`!";
-    static List<String> splitPath(String path) {
+    public static List<String> splitPath(String path) {
         return Arrays.asList(path.split(File.separator));
     }
 
-    static String buildAndroidListCommand(String path) {
+    public static String buildAndroidListCommand(String path) {
         return "adb shell ls " + escapeParameter(path);
     }
 
