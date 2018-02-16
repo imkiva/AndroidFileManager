@@ -11,7 +11,8 @@ import static org.junit.Assert.*;
 public class FileManagerTest {
     @Test
     public void mainDir() {
-        FileManager manager = new FileManager("/storage/sdcard0");
+        FileManager manager = new FileManager();
+        manager.getNavigator().navigate("/storage/sdcard0");
         assertEquals("/storage/sdcard0/", manager.getNavigator().getCurrentPath());
     }
 }
