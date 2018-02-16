@@ -46,7 +46,6 @@ public class FxMain extends FxApplication implements OnCacheUpdatedListener {
 
     private void initData() {
         mManager = new FileManager();
-        mManager = new FileManager();
         mManager.addOnCacheUpdatedListener(this);
         mNavigator = mManager.getNavigator();
 
