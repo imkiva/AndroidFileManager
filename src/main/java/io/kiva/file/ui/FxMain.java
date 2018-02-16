@@ -49,7 +49,9 @@ public class FxMain extends FxApplication implements OnCacheUpdatedListener {
         mManager = new FileManager();
         mManager.addOnCacheUpdatedListener(this);
         mNavigator = mManager.getNavigator();
-        mNavigator.navigate("/");
+
+        List<String> args = getParameters().getRaw();
+        mNavigator.navigate(args.isEmpty() ? "/" : args.get(0));
     }
 
     @Override
