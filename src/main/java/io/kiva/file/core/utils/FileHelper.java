@@ -25,6 +25,10 @@ public final class FileHelper {
         return ADB_SHELL_PREFIX + " echo " + escapeParameter(signal);
     }
 
+    public static boolean isRootDirectory(String dir) {
+        return dir.trim().equals(File.separator);
+    }
+
     private static String escapeParameter(String parameter) {
         StringBuilder builder = new StringBuilder("\"");
         for (char c : parameter.toCharArray()) {

@@ -4,6 +4,7 @@ import io.kiva.file.core.DirectoryNavigator;
 import io.kiva.file.core.FileManager;
 import io.kiva.file.core.OnCacheUpdatedListener;
 import io.kiva.file.core.model.FileModel;
+import io.kiva.file.core.utils.FileHelper;
 import io.kiva.file.ui.model.FileViewModel;
 import io.kiva.file.ui.model.TopDirModel;
 import io.kiva.fx.FxApplication;
@@ -58,7 +59,9 @@ public class FxApp extends FxApplication implements OnCacheUpdatedListener, Even
     public void onCacheUpdated(String path, List<FileModel> newCache) {
         Platform.runLater(() -> {
             ArrayList<FileViewModel> models = new ArrayList<>();
-            models.add(new TopDirModel());
+            if (!FileHelper.isRootDirectory(path)) {
+                models.add(new TopDirModel());
+            }
             models.addAll(newCache.stream()
                     .map(FileViewModel::new)
                     .collect(Collectors.toList()));
@@ -86,6 +89,9 @@ public class FxApp extends FxApplication implements OnCacheUpdatedListener, Even
     @Override
     public void handle(MouseEvent event) {
         FileViewModel model = mListView.getSelectionModel().getSelectedItem();
+        if (model == null) {
+            return;
+        }
 
         if (model instanceof TopDirModel) {
             mNavigator.navigateTop();
