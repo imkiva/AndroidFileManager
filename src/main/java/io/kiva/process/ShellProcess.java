@@ -1,6 +1,6 @@
 package io.kiva.process;
 
-import io.kiva.android.file.core.utils.Log;
+import io.kiva.file.core.utils.Log;
 
 import java.io.IOException;
 
