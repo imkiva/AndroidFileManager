@@ -25,6 +25,9 @@ public class DirectoryNavigator {
     }
 
     public void addOnDirectoryChangedListener(OnDirectoryChangedListener listener) {
+        if (listener == null) {
+            throw new NullPointerException();
+        }
         mListeners.add(listener);
     }
 

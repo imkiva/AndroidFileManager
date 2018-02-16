@@ -99,7 +99,8 @@ public class ShellProcess implements AutoCloseable, IOutputListener {
         ProcessBuilder builder = new ProcessBuilder(shell);
         builder.redirectErrorStream(true);
         try {
-            return new ShellProcess(builder.start());
+            Process process = builder.start();
+            return new ShellProcess(process);
 
         } catch (IOException e) {
             throw new RuntimeException("Failed to start shell process", e);

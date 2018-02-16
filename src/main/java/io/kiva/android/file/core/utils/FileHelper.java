@@ -9,13 +9,21 @@ import java.util.List;
  * @date 2018/2/14
  */
 public final class FileHelper {
+     private static final String ADB_SHELL_PREFIX = "adb shell";
+//    private static final String ADB_SHELL_PREFIX = "";
+
     private static final String CHARS_ESCAPE = "\"\\$`!";
+
     public static List<String> splitPath(String path) {
         return Arrays.asList(path.split(File.separator));
     }
 
     public static String buildAndroidListCommand(String path) {
-        return "adb shell ls " + escapeParameter(path);
+        return ADB_SHELL_PREFIX + " ls -l " + escapeParameter(path);
+    }
+
+    public static String buildAndroidFinishCommand(String signal) {
+        return ADB_SHELL_PREFIX + " echo " + escapeParameter(signal);
     }
 
     private static String escapeParameter(String parameter) {

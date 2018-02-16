@@ -1,67 +1,92 @@
 package io.kiva.android.file.core;
 
+import io.kiva.android.file.core.model.FileModel;
 import io.kiva.android.file.core.model.ModelFactory;
-import io.kiva.android.file.core.parser.impl.DirOutputParser;
-import io.kiva.android.file.core.parser.impl.LsOutputParser;
+import io.kiva.android.file.core.utils.FileHelper;
+import io.kiva.android.file.core.utils.Log;
 import io.kiva.process.IOutputListener;
 import io.kiva.process.ProcessOutput;
 import io.kiva.process.ShellProcess;
-import io.kiva.android.file.core.utils.FileHelper;
-import io.kiva.android.file.core.utils.Platform;
-import io.kiva.android.file.core.utils.SystemProperty;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author kiva
  * @date 2018/2/14
  */
 public class FileManager implements OnDirectoryChangedListener, IOutputListener {
-    private static final String USER_DIR_PROPERTY = "user.dir";
-    private static final ModelFactory FACTORY;
+    private static final String COMMAND_END = "----AFM---COMMAND-END----";
+    private static final ModelFactory FACTORY = ModelFactory.create();
 
-    static {
-        switch (Platform.get()) {
-            case WINDOWS:
-                FACTORY = new ModelFactory(new DirOutputParser());
-                break;
-            case LINUX:
-            case AIX:
-            case BSD:
-            case SOLARIS:
-                FACTORY = new ModelFactory(new LsOutputParser());
-                break;
-            default:
-                throw new RuntimeException("Unknown platform");
-        }
-    }
-
-    private final DirectoryNavigator mDirectoryNavigator;
-    private final DirectoryCache mCache;
+    private final ArrayList<OnCacheUpdatedListener> mListeners = new ArrayList<>();
+    private final DirectoryNavigator mDirectoryNavigator = new DirectoryNavigator();
+    private final DirectoryCache mCache = new DirectoryCache();
     private final ShellProcess mShell;
 
-    public FileManager() {
-        this(SystemProperty.get(USER_DIR_PROPERTY));
-    }
+    private String mLoadingPath;
+    private ArrayList<FileModel> mLoading;
 
-    public FileManager(String mainDir) {
-        mDirectoryNavigator = new DirectoryNavigator();
-        mDirectoryNavigator.navigate(mainDir);
-        mDirectoryNavigator.addOnDirectoryChangedListener(this);
-        mCache = new DirectoryCache();
+    public FileManager() {
         mShell = ShellProcess.open();
+        mShell.setSafeExit(true);
+        mShell.setWaitTimeout(1000);
         mShell.setOutputListener(this);
+        mDirectoryNavigator.addOnDirectoryChangedListener(this);
     }
 
     public DirectoryNavigator getNavigator() {
         return mDirectoryNavigator;
     }
 
+    public List<FileModel> getCurrentFileList() {
+        return mCache.get(getNavigator().getCurrentPath());
+    }
+
+    public void addOnCacheUpdatedListener(OnCacheUpdatedListener listener) {
+        if (listener == null) {
+            throw new NullPointerException();
+        }
+        this.mListeners.add(listener);
+    }
+
+    public void removeOnCacheUpdatedListener(OnCacheUpdatedListener listener) {
+        this.mListeners.remove(listener);
+    }
+
     @Override
     public void onDirectoryChanged(String newPath) {
-        mShell.writeCommand(FileHelper.buildAndroidListCommand(newPath));
+        Log.d("Updating cache for " + newPath);
+        mLoading = new ArrayList<>();
+        mLoadingPath = newPath;
+        mShell.writeCommand(FileHelper.buildAndroidListCommand(newPath)
+                + ";"
+                + FileHelper.buildAndroidFinishCommand(COMMAND_END));
     }
 
     @Override
     public void onNewOutput(ProcessOutput output) {
+        Log.i("-> " + output.getLine());
+        if (output.getLine().equals(COMMAND_END)) {
+            Log.d("Cache for " + mLoadingPath + " updated");
+            mCache.update(mLoadingPath, mLoading);
+            notifyChangeUpdated(mLoadingPath, mLoading);
+            mLoadingPath = null;
+            mLoading = null;
+            return;
+        }
 
+        FileModel model = FACTORY.parseModel(output);
+        if (model != null) {
+            mLoading.add(model);
+        }
+    }
+
+    private void notifyChangeUpdated(String path, List<FileModel> cache) {
+        mListeners.forEach(listener -> listener.onCacheUpdated(path, cache));
+    }
+
+    public void dispose() {
+        mShell.close();
     }
 }

@@ -3,8 +3,11 @@ package io.kiva.android.file.core.model;
 import io.kiva.android.file.core.parser.FileType;
 import io.kiva.android.file.core.parser.IOutputParser;
 import io.kiva.android.file.core.parser.ParseResult;
-import io.kiva.process.ProcessOutput;
+import io.kiva.android.file.core.parser.impl.DirOutputParser;
+import io.kiva.android.file.core.parser.impl.LsOutputParser;
 import io.kiva.android.file.core.utils.Log;
+import io.kiva.android.file.core.utils.Platform;
+import io.kiva.process.ProcessOutput;
 
 /**
  * @author kiva
@@ -12,6 +15,20 @@ import io.kiva.android.file.core.utils.Log;
  */
 public class ModelFactory {
     private IOutputParser mParser;
+
+    public static ModelFactory create() {
+        switch (Platform.get()) {
+            case WINDOWS:
+                return new ModelFactory(new DirOutputParser());
+            case LINUX:
+            case AIX:
+            case BSD:
+            case SOLARIS:
+                return new ModelFactory(new LsOutputParser());
+            default:
+                throw new RuntimeException("Unknown platform");
+        }
+    }
 
     public ModelFactory(IOutputParser mParser) {
         this.mParser = mParser;
