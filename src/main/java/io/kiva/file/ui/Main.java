@@ -10,7 +10,7 @@ public class Main {
     public static void main(String[] args) {
         if (args.length > 0) {
             if (args[0].equals("-gui")) {
-                FxApplication.launch(FxApp.class, "/storage/sdcard0");
+                FxApplication.launch(GuiApp.class, "/storage/sdcard0");
                 return;
             }
         }

@@ -14,6 +14,10 @@ public class FileModel {
         this.mParseResult = parseResult;
     }
 
+    public FileType getFileType() {
+        return mParseResult.mType;
+    }
+
     public boolean isDirectory() {
         return mParseResult.mType == FileType.DIRECTORY;
     }

@@ -1,6 +1,6 @@
 package io.kiva.fx;
 
-import io.kiva.file.ui.FxApp;
+import io.kiva.file.ui.GuiApp;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -52,7 +52,7 @@ public abstract class FxApplication extends Application {
     protected void setContentView(String resName) {
         try {
             mRootLayoutLoader = new FXMLLoader();
-            mRootLayoutLoader.setLocation(FxApp.class.getResource(LAYOUT_PREFIX + resName));
+            mRootLayoutLoader.setLocation(GuiApp.class.getResource(LAYOUT_PREFIX + resName));
             mRootLayout = mRootLayoutLoader.load();
 
             Scene scene = new Scene(mRootLayout);

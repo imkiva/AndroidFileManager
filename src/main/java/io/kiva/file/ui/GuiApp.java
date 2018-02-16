@@ -5,20 +5,21 @@ import io.kiva.file.core.FileManager;
 import io.kiva.file.core.OnCacheUpdatedListener;
 import io.kiva.file.core.model.FileModel;
 import io.kiva.file.core.utils.FileHelper;
+import io.kiva.file.ui.cell.FileCell;
 import io.kiva.file.ui.model.FileViewModel;
 import io.kiva.file.ui.model.TopDirModel;
 import io.kiva.fx.FxApplication;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
+import javafx.event.EventType;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.text.Text;
-import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
@@ -29,7 +30,7 @@ import java.util.stream.Collectors;
  * @author kiva
  * @date 2018/2/16
  */
-public class FxApp extends FxApplication implements OnCacheUpdatedListener, EventHandler<MouseEvent> {
+public class GuiApp extends FxApplication implements OnCacheUpdatedListener, EventHandler<MouseEvent> {
     private ListView<FileViewModel> mListView;
 
     private FileManager mManager;
@@ -46,7 +47,27 @@ public class FxApp extends FxApplication implements OnCacheUpdatedListener, Even
         mListView = (ListView<FileViewModel>) mRootLayout.getCenter();
         mListView.setCellFactory(this::onCreateListCell);
         mListView.setFixedCellSize(50);
+
+        MenuBar menuBar = (MenuBar) mRootLayout.getTop();
+        menuBar.setUseSystemMenuBar(true);
+        initMenu(menuBar);
+
         initData();
+    }
+
+    private void initMenu(MenuBar menuBar) {
+        ObservableList<Menu> menus = menuBar.getMenus();
+        Menu refresh = new Menu("Refresh");
+        refresh.addEventHandler(EventType.ROOT, event -> {
+            mNavigator.navigate(mNavigator.getCurrentPath());
+        });
+
+        Menu navigateTo = new Menu("Goto");
+        navigateTo.addEventHandler(EventType.ROOT, event -> {
+            // TODO: Navigate to someplace
+        });
+        menus.add(refresh);
+        menus.add(navigateTo);
     }
 
     @Override
@@ -72,7 +93,7 @@ public class FxApp extends FxApplication implements OnCacheUpdatedListener, Even
     }
 
     private ListCell<FileViewModel> onCreateListCell(ListView<FileViewModel> listView) {
-        FileCell fileCell = new FileCell();
+        FileCell fileCell = new FileCell(this);
         fileCell.setOnMouseClicked(this);
         return fileCell;
     }
@@ -98,35 +119,6 @@ public class FxApp extends FxApplication implements OnCacheUpdatedListener, Even
 
         } else if (model.getFileModel().isDirectory()) {
             mNavigator.navigateInto(model.getFileModel().getName());
-        }
-    }
-
-    public class FileCell extends ListCell<FileViewModel> {
-        FileCell() {
-        }
-
-        @Override
-        protected void updateItem(FileViewModel item, boolean empty) {
-            super.updateItem(item, empty);
-            if (item == null) {
-                setGraphic(null);
-                return;
-            }
-            FileModel model = item.getFileModel();
-            BorderPane pane = new BorderPane();
-            Text text = new Text();
-            text.setTextAlignment(TextAlignment.LEFT);
-            text.setText(model.getName());
-
-            Image image = model.isDirectory()
-                    ? loadImage("file_type_dir.png")
-                    : loadImage("file_type_unknown.png");
-
-            ImageView imageView = new ImageView(image);
-
-            pane.setLeft(imageView);
-            pane.setCenter(text);
-            this.setGraphic(pane);
         }
     }
 }
