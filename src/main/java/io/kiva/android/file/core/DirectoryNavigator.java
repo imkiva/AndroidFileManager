@@ -57,7 +57,7 @@ public class DirectoryNavigator {
 
     public void navigate(String newPath) {
         mDirs.clear();
-        FilePathHelper.splitPath(newPath)
+        FileHelper.splitPath(newPath)
                 .stream()
                 .filter(s -> !s.isEmpty())
                 .forEach(it -> mDirs.push(it));
