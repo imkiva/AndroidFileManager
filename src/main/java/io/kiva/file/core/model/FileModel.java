@@ -10,7 +10,7 @@ import io.kiva.file.core.parser.ParseResult;
 public class FileModel {
     private ParseResult mParseResult;
 
-    FileModel(ParseResult parseResult) {
+    public FileModel(ParseResult parseResult) {
         this.mParseResult = parseResult;
     }
 

@@ -18,7 +18,7 @@ public final class FileHelper {
     }
 
     public static String buildAndroidListCommand(String path) {
-        return ADB_SHELL_PREFIX + " ls -l " + escapeParameter(path);
+        return ADB_SHELL_PREFIX + " ls -al " + escapeParameter(path);
     }
 
     public static String buildAndroidFinishCommand(String signal) {

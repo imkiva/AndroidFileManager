@@ -73,6 +73,13 @@ public class DirectoryNavigator {
         return joinToPath(mDirs.stream());
     }
 
+    public String getParentPath() {
+        if (mDirs.empty()) {
+            return File.separator;
+        }
+        return joinToPath(mDirs.stream().limit(mDirs.size() - 1));
+    }
+
     private String joinToPath(Stream<String> stream) {
         StringBuilder builder = new StringBuilder(File.separator);
         stream.forEach(it -> builder.append(it).append(File.separator));

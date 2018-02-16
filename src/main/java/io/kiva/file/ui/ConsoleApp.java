@@ -17,11 +17,11 @@ import java.util.Locale;
  * @author kiva
  * @date 2018/2/16
  */
-public class CommandLine implements OnCacheUpdatedListener {
+public class ConsoleApp implements OnCacheUpdatedListener {
     private final FileManager mManager;
     private final DirectoryNavigator mNavigator;
 
-    public CommandLine(String mainDir) {
+    public ConsoleApp(String mainDir) {
         Log.setLogEnabled(false);
         mManager = new FileManager();
         mManager.addOnCacheUpdatedListener(this);

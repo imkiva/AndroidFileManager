@@ -32,5 +32,12 @@ public class DirectoryNavigatorTest {
 
         navigator.navigateInto("bin");
         assertEquals("/usr/lib/jvm/bin/", navigator.getCurrentPath());
+        assertEquals("/usr/lib/jvm/", navigator.getParentPath());
+
+        navigator.navigate("/");
+        assertEquals("/", navigator.getParentPath());
+
+        navigator.navigate("");
+        assertEquals("/", navigator.getParentPath());
     }
 }
