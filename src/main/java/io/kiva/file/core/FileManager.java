@@ -8,7 +8,6 @@ import io.kiva.process.IOutputListener;
 import io.kiva.process.ProcessOutput;
 import io.kiva.process.ShellProcess;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -28,7 +27,8 @@ public class FileManager implements OnDirectoryChangedListener, IOutputListener 
         } else if (!lhsIsDir && rhsIsDir) {
             return 1;
         } else if (lhsIsDir) {
-            return lhs.getName().toLowerCase()
+            return lhs.getName()
+                    .toLowerCase()
                     .compareTo(rhs.getName().toLowerCase());
         } else {
             return lhs.getName().compareTo(rhs.getName());

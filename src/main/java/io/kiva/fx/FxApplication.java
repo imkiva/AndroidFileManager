@@ -14,7 +14,7 @@ import java.io.IOException;
  * @author kiva
  * @date 2018/2/16
  */
-public class FxApplication extends Application {
+public abstract class FxApplication extends Application {
     private static final String LAYOUT_PREFIX = "/res/layout/";
     private static final String DRAWABLE_PREFIX = "/res/drawable/";
 

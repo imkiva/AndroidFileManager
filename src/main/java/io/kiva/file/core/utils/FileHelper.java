@@ -10,7 +10,6 @@ import java.util.List;
  */
 public final class FileHelper {
      private static final String ADB_SHELL_PREFIX = "adb shell";
-//    private static final String ADB_SHELL_PREFIX = "";
 
     private static final String CHARS_ESCAPE = "\"\\$`!";
 
