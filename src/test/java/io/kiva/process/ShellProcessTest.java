@@ -1,4 +1,4 @@
-package io.kiva.android.file.core.process;
+package io.kiva.process;
 
 import io.kiva.android.file.core.utils.Platform;
 import org.junit.Test;

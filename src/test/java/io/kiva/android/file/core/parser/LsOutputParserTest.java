@@ -1,7 +1,7 @@
 package io.kiva.android.file.core.parser;
 
 import io.kiva.android.file.core.parser.impl.LsOutputParser;
-import io.kiva.android.file.core.process.ProcessOutput;
+import io.kiva.process.ProcessOutput;
 import org.junit.Test;
 
 import java.util.Arrays;

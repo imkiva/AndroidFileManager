@@ -1,6 +1,6 @@
 package io.kiva.android.file.core.parser;
 
-import io.kiva.android.file.core.process.ProcessOutput;
+import io.kiva.process.ProcessOutput;
 
 /**
  * @author kiva

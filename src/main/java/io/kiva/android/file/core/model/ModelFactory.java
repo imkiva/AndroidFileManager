@@ -3,7 +3,7 @@ package io.kiva.android.file.core.model;
 import io.kiva.android.file.core.parser.FileType;
 import io.kiva.android.file.core.parser.IOutputParser;
 import io.kiva.android.file.core.parser.ParseResult;
-import io.kiva.android.file.core.process.ProcessOutput;
+import io.kiva.process.ProcessOutput;
 import io.kiva.android.file.core.utils.Log;
 
 /**
