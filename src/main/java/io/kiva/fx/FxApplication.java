@@ -70,7 +70,7 @@ public class FxApplication extends Application {
 
     private void ensureStage() {
         if (mPrimaryStage == null) {
-            throw new NullPointerException("Child didn't call super.start(Stage)");
+            throw new NullPointerException("Child didn't onCreateListCell super.start(Stage)");
         }
     }
 }
