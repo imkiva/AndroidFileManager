@@ -9,6 +9,11 @@ import io.kiva.file.core.parser.ParseResult;
  */
 public class FileModel {
     private ParseResult mParseResult;
+    private FileModel mSymbolLinkTarget;
+
+    public FileModel getSymbolLinkTarget() {
+        return mSymbolLinkTarget;
+    }
 
     public FileModel(ParseResult parseResult) {
         this.mParseResult = parseResult;

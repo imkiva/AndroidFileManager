@@ -88,6 +88,6 @@ final class ConsoleApp implements OnCacheUpdatedListener {
     }
 
     private void showFiles() {
-        showFiles(mManager.getCurrentFileList());
+        showFiles(mManager.getCachedCurrentFileList());
     }
 }

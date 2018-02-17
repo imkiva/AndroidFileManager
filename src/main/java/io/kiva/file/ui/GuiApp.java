@@ -5,6 +5,7 @@ import io.kiva.file.core.FileManager;
 import io.kiva.file.core.OnCacheUpdatedListener;
 import io.kiva.file.core.model.FileModel;
 import io.kiva.file.core.utils.FileHelper;
+import io.kiva.file.core.utils.Log;
 import io.kiva.file.ui.cell.FileCell;
 import io.kiva.file.ui.model.FileViewModel;
 import io.kiva.file.ui.model.TopDirModel;
@@ -22,6 +23,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -79,17 +81,22 @@ public class GuiApp extends FxApplication implements OnCacheUpdatedListener, Eve
     @Override
     public void onCacheUpdated(String path, List<FileModel> newCache) {
         Platform.runLater(() -> {
-            ArrayList<FileViewModel> models = new ArrayList<>();
-            if (!FileHelper.isRootDirectory(path)) {
-                models.add(new TopDirModel());
+            List<FileViewModel> models = mapToViewModel(path, newCache);
+            synchronized (this) {
+                mListView.setItems(FXCollections.observableArrayList(models));
             }
-            models.addAll(newCache.stream()
-                    .map(FileViewModel::new)
-                    .collect(Collectors.toList()));
-            mListView.setItems(null);
-            mListView.setItems(FXCollections.observableArrayList(models));
-            mListView.scrollTo(0);
         });
+    }
+
+    private List<FileViewModel> mapToViewModel(String path, List<FileModel> newCache) {
+        ArrayList<FileViewModel> models = new ArrayList<>();
+        if (!FileHelper.isRootDirectory(path)) {
+            models.add(new TopDirModel());
+        }
+        models.addAll(newCache.stream()
+                .map(FileViewModel::new)
+                .collect(Collectors.toList()));
+        return models;
     }
 
     private ListCell<FileViewModel> onCreateListCell(ListView<FileViewModel> listView) {
@@ -112,6 +119,29 @@ public class GuiApp extends FxApplication implements OnCacheUpdatedListener, Eve
         FileViewModel model = mListView.getSelectionModel().getSelectedItem();
         if (model == null) {
             return;
+        }
+
+        // Apply caches first.
+        // Replace them in onCacheUpdated()
+        synchronized (this) {
+            String cachedPath = null;
+            if (model instanceof TopDirModel) {
+                cachedPath = mNavigator.getParentPath();
+            } else if (model.getFileModel().isDirectory()) {
+                cachedPath = mNavigator.getCurrentPath()
+                        + model.getFileModel().getName()
+                        + File.separator;
+            }
+            if (cachedPath != null) {
+                List<FileModel> cachedModels = mManager.getCachedFileList(cachedPath);
+                Log.d("Checking cache for " + cachedPath);
+                if (cachedModels.size() > 0) {
+                    Log.d("Hit cache: " + cachedPath);
+                }
+                List<FileViewModel> cached = mapToViewModel(cachedPath, cachedModels);
+                mListView.setItems(FXCollections.observableArrayList(cached));
+                mListView.scrollTo(0);
+            }
         }
 
         if (model instanceof TopDirModel) {

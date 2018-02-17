@@ -55,8 +55,12 @@ public class FileManager implements OnDirectoryChangedListener, IOutputListener 
         return mDirectoryNavigator;
     }
 
-    public List<FileModel> getCurrentFileList() {
-        return mCache.get(getNavigator().getCurrentPath());
+    public List<FileModel> getCachedCurrentFileList() {
+        return getCachedFileList(mDirectoryNavigator.getCurrentPath());
+    }
+
+    public List<FileModel> getCachedFileList(String path) {
+        return mCache.get(path);
     }
 
     public void addOnCacheUpdatedListener(OnCacheUpdatedListener listener) {
