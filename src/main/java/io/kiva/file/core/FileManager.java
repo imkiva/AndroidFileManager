@@ -97,6 +97,15 @@ public class FileManager implements OnDirectoryChangedListener, IOutputListener 
         mShell.addCommand(new CreateDirectoryCommand(file.getAbsolutePath()));
     }
 
+    public void deleteRecursively(String name) {
+        deleteRecursively(mDirectoryNavigator.getCurrentPath(), name);
+    }
+
+    public void deleteRecursively(String parentPath, String name) {
+        File file = new File(parentPath, name);
+        mShell.addCommand(new DeleteCommand(file.getAbsolutePath()));
+    }
+
     @Override
     public void onNewOutput(ProcessOutput output) {
         String line = output.getLine();

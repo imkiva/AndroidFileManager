@@ -15,4 +15,8 @@ final class CommandHelper {
     public static String createDirectoryCommand(String path) {
         return ADB_SHELL_PREFIX + " mkdir " + ShellHelper.escapeParameter(path);
     }
+
+    public static String deleteCommand(String path) {
+        return ADB_SHELL_PREFIX + " rm -rf " + ShellHelper.escapeParameter(path);
+    }
 }

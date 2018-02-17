@@ -10,6 +10,6 @@ public class DeleteCommand extends Command {
     public static final String SIGNAL = Command.makeSignal("RM_RF");
 
     public DeleteCommand(String path) {
-        super(CommandHelper.createDirectoryCommand(path), SIGNAL, path);
+        super(CommandHelper.deleteCommand(path), SIGNAL, path);
     }
 }

@@ -21,7 +21,6 @@ final class CommandWriter {
             String s = command.getCommand()
                     + ";"
                     + finishCommand(command.getSignal(), command.getUserData());
-            System.out.println(s);
             mOutputStream.write(s.getBytes());
             mOutputStream.write(SEPARATOR.getBytes());
             mOutputStream.flush();

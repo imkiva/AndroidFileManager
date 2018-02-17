@@ -16,10 +16,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.scene.control.*;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyCodeCombination;
-import javafx.scene.input.KeyCombination;
-import javafx.scene.input.MouseEvent;
+import javafx.scene.input.*;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
@@ -37,6 +34,7 @@ public class GuiApp extends FxApplication implements FileManagerCallback, EventH
 
     private FileManager mManager;
     private DirectoryNavigator mNavigator;
+    private ContextMenu mItemContextMenu;
 
     @SuppressWarnings("unchecked")
     @Override
@@ -89,7 +87,14 @@ public class GuiApp extends FxApplication implements FileManagerCallback, EventH
         refreshItem.setOnAction(event -> refresh());
 
         fileMenu.getItems().addAll(newItem, new SeparatorMenuItem(), refreshItem, gotoItem);
-        menus.add(fileMenu);
+
+        menus.addAll(fileMenu);
+
+        MenuItem delete = new MenuItem("_Delete");
+        delete.setMnemonicParsing(true);
+        delete.setAccelerator(new KeyCodeCombination(KeyCode.D, KeyCombination.SHORTCUT_DOWN));
+        delete.setOnAction(event -> handleDelete(mListView.getSelectionModel().getSelectedItem()));
+        mItemContextMenu = new ContextMenu(delete);
     }
 
     @Override
@@ -143,6 +148,7 @@ public class GuiApp extends FxApplication implements FileManagerCallback, EventH
     private ListCell<FileViewModel> onCreateListCell(ListView<FileViewModel> listView) {
         FileCell fileCell = new FileCell(this);
         fileCell.setOnMouseClicked(this);
+        fileCell.setContextMenu(mItemContextMenu);
         return fileCell;
     }
 
@@ -155,13 +161,28 @@ public class GuiApp extends FxApplication implements FileManagerCallback, EventH
         mNavigator.navigate(args.isEmpty() ? "/" : args.get(0));
     }
 
-    @Override
-    public void handle(MouseEvent event) {
-        FileViewModel model = mListView.getSelectionModel().getSelectedItem();
+    private void handleDelete(FileViewModel model) {
         if (model == null) {
             return;
         }
 
+        FileModel fileModel = model.getFileModel();
+        Alert dialog = new Alert(Alert.AlertType.CONFIRMATION);
+        dialog.setTitle("Delete");
+        dialog.setHeaderText(fileModel.getName());
+        dialog.setContentText("This is unrecoverable.\nAre you sure?");
+
+        dialog.showAndWait().ifPresent(r -> {
+            if (r == ButtonType.OK) {
+                mManager.deleteRecursively(fileModel.getName());
+            }
+        });
+    }
+
+    private void handleNavigateInto(FileViewModel model) {
+        if (model == null) {
+            return;
+        }
         FileModel fileModel = model.getFileModel();
 
         // Apply caches first.
@@ -192,11 +213,20 @@ public class GuiApp extends FxApplication implements FileManagerCallback, EventH
         } else if (fileModel.isDirectory()) {
             mNavigator.navigateInto(fileModel.getName());
 
-        } else if (fileModel.getFileType() == FileType.SYMBOL_LINK){
+        } else if (fileModel.getFileType() == FileType.SYMBOL_LINK) {
             FileModel target = fileModel.getSymbolLinkTarget();
             if (target != null) {
                 mNavigator.navigateInto(target.getName());
             }
+        }
+    }
+
+    @Override
+    public void handle(MouseEvent event) {
+        if (event.getButton() == MouseButton.PRIMARY
+                && event.getClickCount() >= 2) {
+            FileViewModel model = mListView.getSelectionModel().getSelectedItem();
+            handleNavigateInto(model);
         }
     }
 }
