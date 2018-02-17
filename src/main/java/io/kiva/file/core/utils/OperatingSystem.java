@@ -4,7 +4,7 @@ package io.kiva.file.core.utils;
  * @author kiva
  * @date 2018/2/14
  */
-public enum Platform {
+public enum OperatingSystem {
     LINUX,
 
     BSD,
@@ -15,7 +15,7 @@ public enum Platform {
 
     WINDOWS;
 
-    public static Platform get() {
+    public static OperatingSystem get() {
         String osName = SystemProperty.get("os.name");
 
         if (osName.equals("Linux")) {
@@ -34,6 +34,6 @@ public enum Platform {
             return WINDOWS;
         }
 
-        throw new UnsupportedOperationException(osName + " is not a supported OS platform.");
+        throw new UnsupportedOperationException(osName + " is not a supported OperatingSystem platform.");
     }
 }

@@ -1,13 +1,16 @@
 package io.kiva.file.core;
 
+import io.kiva.file.core.command.CreateDirectoryCommand;
+import io.kiva.file.core.command.DeleteCommand;
+import io.kiva.file.core.command.LsCommand;
 import io.kiva.file.core.model.FileModel;
 import io.kiva.file.core.model.ModelFactory;
 import io.kiva.file.core.parser.FileType;
 import io.kiva.file.core.utils.FileHelper;
 import io.kiva.file.core.utils.Log;
+import io.kiva.process.Command;
 import io.kiva.process.IOutputListener;
 import io.kiva.process.ProcessOutput;
-import io.kiva.process.ShellHelper;
 import io.kiva.process.ShellProcess;
 
 import java.io.File;
@@ -20,6 +23,7 @@ import java.util.List;
  * @date 2018/2/14
  */
 public class FileManager implements OnDirectoryChangedListener, IOutputListener {
+
     private static final ModelFactory FACTORY = ModelFactory.create();
     private static final Comparator<FileModel> COMPARATOR = (lhs, rhs) -> {
         boolean lhsIsDir = lhs.isDirectory();
@@ -37,13 +41,13 @@ public class FileManager implements OnDirectoryChangedListener, IOutputListener 
         }
     };
 
-    private final ArrayList<OnCacheUpdatedListener> mListeners = new ArrayList<>();
+    private final ArrayList<FileManagerCallback> mListeners = new ArrayList<>();
     private final DirectoryNavigator mDirectoryNavigator = new DirectoryNavigator();
     private final DirectoryCache mCache = new DirectoryCache();
     private final ShellProcess mShell;
 
     private String mLoadingPath;
-    private ArrayList<FileModel> mLoading;
+    private ArrayList<FileModel> mLoadingModels;
 
     public FileManager() {
         mShell = ShellProcess.open();
@@ -65,46 +69,79 @@ public class FileManager implements OnDirectoryChangedListener, IOutputListener 
         return mCache.get(path);
     }
 
-    public void addOnCacheUpdatedListener(OnCacheUpdatedListener listener) {
+    public void addOnCacheUpdatedListener(FileManagerCallback listener) {
         if (listener == null) {
             throw new NullPointerException();
         }
         this.mListeners.add(listener);
     }
 
-    public void removeOnCacheUpdatedListener(OnCacheUpdatedListener listener) {
+    public void removeOnCacheUpdatedListener(FileManagerCallback listener) {
         this.mListeners.remove(listener);
     }
 
     @Override
     public void onDirectoryChanged(String newPath) {
         Log.d("Updating cache for " + newPath);
-        mLoading = new ArrayList<>();
         mLoadingPath = newPath;
-        mShell.writeCommand(FileHelper.buildAndroidListCommand(newPath));
+        mLoadingModels = new ArrayList<>();
+        mShell.addCommand(new LsCommand(newPath));
+    }
+
+    public void createDirectory(String dirName) {
+        createDirectory(mDirectoryNavigator.getCurrentPath(), dirName);
+    }
+
+    public void createDirectory(String parentPath, String dirName) {
+        File file = new File(parentPath, dirName);
+        mShell.addCommand(new CreateDirectoryCommand(file.getAbsolutePath()));
     }
 
     @Override
     public void onNewOutput(ProcessOutput output) {
-        if (output.isFinishFlag()) {
-            Log.d("Cache for " + mLoadingPath + " updated");
-            resolveSymbolLink(mLoading);
-            mLoading.sort(COMPARATOR);
-            mCache.update(mLoadingPath, mLoading);
-            notifyChangeUpdated(mLoadingPath, mLoading);
-            mLoadingPath = null;
-            mLoading = null;
+        String line = output.getLine();
+        if (!Command.isSignal(line)) {
+            FileModel model = FACTORY.parseModel(output);
+            if (model != null) {
+                mLoadingModels.add(model);
+            }
             return;
         }
 
-        FileModel model = FACTORY.parseModel(output);
-        if (model != null) {
-            mLoading.add(model);
+        if (line.startsWith(LsCommand.SIGNAL)) {
+            Log.d("Cache for " + mLoadingPath + " updated");
+            resolveSymbolLink(mLoadingModels);
+            mLoadingModels.sort(COMPARATOR);
+            mCache.update(mLoadingPath, mLoadingModels);
+            notifyChangeUpdated(mLoadingPath, mLoadingModels);
+            mLoadingPath = null;
+            mLoadingModels = null;
+            return;
+        }
+
+        if (line.startsWith(CreateDirectoryCommand.SIGNAL)) {
+            String directory = line.substring(CreateDirectoryCommand.SIGNAL.length());
+            notifyDirectoryCreated(directory);
+            return;
+        }
+
+        if (line.startsWith(DeleteCommand.SIGNAL)) {
+            String path = line.substring(DeleteCommand.SIGNAL.length());
+            notifyDirectoryCreated(path);
+            return;
         }
     }
 
     private void notifyChangeUpdated(String path, List<FileModel> cache) {
         mListeners.forEach(listener -> listener.onCacheUpdated(path, cache));
+    }
+
+    private void notifyDirectoryCreated(String dir) {
+        mListeners.forEach(listener -> listener.onDirectoryCreated(dir));
+    }
+
+    private void notifyFileDeleted(String path) {
+        mListeners.forEach(listener -> listener.onFileDeleted(path));
     }
 
     public void dispose() {

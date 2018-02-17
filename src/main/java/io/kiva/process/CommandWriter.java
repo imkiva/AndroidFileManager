@@ -16,12 +16,23 @@ final class CommandWriter {
         this.mOutputStream = mOutputStream;
     }
 
-    public void addCommand(String command) {
+    public void addCommand(Command command) {
         try {
-            mOutputStream.write(command.getBytes());
+            String s = command.getCommand()
+                    + ";"
+                    + finishCommand(command.getSignal(), command.getUserData());
+            System.out.println(s);
+            mOutputStream.write(s.getBytes());
             mOutputStream.write(SEPARATOR.getBytes());
             mOutputStream.flush();
         } catch (IOException ignore) {
         }
+    }
+
+    private static String finishCommand(String signal, String data) {
+        if (signal == null) {
+            return "";
+        }
+        return " echo " + ShellHelper.escapeParameter(signal + data);
     }
 }

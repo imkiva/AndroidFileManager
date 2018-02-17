@@ -8,7 +8,10 @@ import java.util.List;
  * @author kiva
  * @date 2018/2/16
  */
-@FunctionalInterface
-public interface OnCacheUpdatedListener {
+public interface FileManagerCallback {
     void onCacheUpdated(String path, List<FileModel> newCache);
+
+    void onDirectoryCreated(String dir);
+
+    void onFileDeleted(String path);
 }

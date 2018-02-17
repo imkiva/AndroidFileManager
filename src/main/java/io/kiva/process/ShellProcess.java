@@ -30,17 +30,19 @@ public class ShellProcess implements AutoCloseable, IOutputListener {
         Log.d("Shell started ---- waiting for commands");
     }
 
-    public void writeCommand(String command) {
+    public void addCommand(String command) {
+        addCommand(new Command(command));
+    }
+
+    public void addCommand(Command command) {
         if (mClosed) {
             throw new ShellClosedException();
         }
-        mCommandWriter.addCommand(command
-                + ";"
-                + ShellHelper.buildFinishCommand(ProcessOutput.END_COMMAND_FLAG));
+        mCommandWriter.addCommand(command);
     }
 
     private void doSafeExit() {
-        mCommandWriter.addCommand("exit 0");
+        mCommandWriter.addCommand(new Command("exit 0"));
         mReaderThread.stopSelf(mWaitTimeout);
     }
 

@@ -23,7 +23,7 @@ public class UnionTest {
         });
         process.setSafeExit(true);
         process.setWaitTimeout(1000);
-        process.writeCommand("adb shell ls -l /sdcard/");
+        process.addCommand("adb shell ls -l /sdcard/");
 
         process.close();
     }

@@ -2,7 +2,7 @@ package io.kiva.file.ui;
 
 import io.kiva.file.core.DirectoryNavigator;
 import io.kiva.file.core.FileManager;
-import io.kiva.file.core.OnCacheUpdatedListener;
+import io.kiva.file.core.FileManagerCallback;
 import io.kiva.file.core.model.FileModel;
 import io.kiva.file.core.parser.FileType;
 import io.kiva.file.core.utils.FileHelper;
@@ -15,8 +15,10 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
-import javafx.event.EventType;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
@@ -30,7 +32,7 @@ import java.util.stream.Collectors;
  * @author kiva
  * @date 2018/2/16
  */
-public class GuiApp extends FxApplication implements OnCacheUpdatedListener, EventHandler<MouseEvent> {
+public class GuiApp extends FxApplication implements FileManagerCallback, EventHandler<MouseEvent> {
     private ListView<FileViewModel> mListView;
 
     private FileManager mManager;
@@ -46,7 +48,7 @@ public class GuiApp extends FxApplication implements OnCacheUpdatedListener, Eve
         BorderPane mRootLayout = getRootLayout();
         mListView = (ListView<FileViewModel>) mRootLayout.getCenter();
         mListView.setCellFactory(this::onCreateListCell);
-        mListView.setFixedCellSize(50);
+        mListView.setFixedCellSize(35);
 
         MenuBar menuBar = (MenuBar) mRootLayout.getTop();
         menuBar.setUseSystemMenuBar(true);
@@ -58,19 +60,35 @@ public class GuiApp extends FxApplication implements OnCacheUpdatedListener, Eve
     private void initMenu(MenuBar menuBar) {
         ObservableList<Menu> menus = menuBar.getMenus();
         Menu fileMenu = new Menu("File");
-        MenuItem gotoItem = new MenuItem("Goto");
-        MenuItem refreshItem = new MenuItem("Refresh");
 
+        MenuItem gotoItem = new MenuItem("_Goto");
+        MenuItem refreshItem = new MenuItem("_Refresh");
+        MenuItem newItem = new MenuItem("_New Directory");
+
+        newItem.setMnemonicParsing(true);
+        newItem.setAccelerator(new KeyCodeCombination(KeyCode.N, KeyCombination.SHORTCUT_DOWN));
+        newItem.setOnAction(event -> {
+            TextInputDialog dialog = new TextInputDialog("New Directory");
+            dialog.setTitle("New Directory");
+            dialog.setHeaderText("Input name of the directory");
+            dialog.showAndWait().ifPresent(mManager::createDirectory);
+        });
+
+        gotoItem.setMnemonicParsing(true);
+        gotoItem.setAccelerator(new KeyCodeCombination(KeyCode.G, KeyCombination.SHORTCUT_DOWN));
         gotoItem.setOnAction(event -> {
             TextInputDialog dialog = new TextInputDialog(mNavigator.getCurrentPath());
-            dialog.setTitle("Input New Path");
+            dialog.setTitle("Goto");
             dialog.setHeaderText("Where you want to go?");
             dialog.setContentText("Absolute Path: ");
             dialog.showAndWait().ifPresent(mNavigator::navigate);
         });
-        refreshItem.setOnAction(event -> mNavigator.navigate(mNavigator.getCurrentPath()));
 
-        fileMenu.getItems().addAll(refreshItem, gotoItem);
+        refreshItem.setMnemonicParsing(true);
+        refreshItem.setAccelerator(new KeyCodeCombination(KeyCode.R, KeyCombination.SHORTCUT_DOWN));
+        refreshItem.setOnAction(event -> refresh());
+
+        fileMenu.getItems().addAll(newItem, new SeparatorMenuItem(), refreshItem, gotoItem);
         menus.add(fileMenu);
     }
 
@@ -93,6 +111,22 @@ public class GuiApp extends FxApplication implements OnCacheUpdatedListener, Eve
                 mListView.setItems(FXCollections.observableArrayList(models));
             }
         });
+    }
+
+    @Override
+    public void onDirectoryCreated(String dir) {
+        Log.d("Directory created: " + dir);
+        refresh();
+    }
+
+    @Override
+    public void onFileDeleted(String path) {
+        Log.d("File deleted: " + path);
+        refresh();
+    }
+
+    private void refresh() {
+        mNavigator.navigate(mNavigator.getCurrentPath());
     }
 
     private List<FileViewModel> mapToViewModel(String path, List<FileModel> newCache) {

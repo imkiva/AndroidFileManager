@@ -6,7 +6,7 @@ import io.kiva.file.core.parser.ParseResult;
 import io.kiva.file.core.parser.impl.DirOutputParser;
 import io.kiva.file.core.parser.impl.LsOutputParser;
 import io.kiva.file.core.utils.Log;
-import io.kiva.file.core.utils.Platform;
+import io.kiva.file.core.utils.OperatingSystem;
 import io.kiva.process.ProcessOutput;
 
 /**
@@ -17,7 +17,7 @@ public class ModelFactory {
     private IOutputParser mParser;
 
     public static ModelFactory create() {
-        switch (Platform.get()) {
+        switch (OperatingSystem.get()) {
             case WINDOWS:
                 return new ModelFactory(new DirOutputParser());
             case LINUX:

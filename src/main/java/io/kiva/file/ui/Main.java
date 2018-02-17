@@ -8,13 +8,8 @@ import io.kiva.fx.FxApplication;
  */
 public class Main {
     public static void main(String[] args) {
-        if (args.length > 0) {
-            if (args[0].equals("-gui")) {
-                FxApplication.launch(GuiApp.class, "/storage/sdcard0");
-                return;
-            }
-        }
-        ConsoleApp consoleApp = new ConsoleApp("/storage/sdcard0");
-        consoleApp.main();
+        FxApplication.launch(GuiApp.class, args.length == 0
+                ? new String[]{"/storage/sdcard0"}
+                : args);
     }
 }

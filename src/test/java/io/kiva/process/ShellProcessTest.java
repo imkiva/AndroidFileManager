@@ -1,6 +1,6 @@
 package io.kiva.process;
 
-import io.kiva.file.core.utils.Platform;
+import io.kiva.file.core.utils.OperatingSystem;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -17,15 +17,15 @@ public class ShellProcessTest {
         ShellProcess shellProcess = ShellProcess.open();
         shellProcess.setSafeExit(true);
         shellProcess.setOutputListener(System.out::println);
-        switch (Platform.get()) {
+        switch (OperatingSystem.get()) {
             case WINDOWS:
-                shellProcess.writeCommand("dir");
+                shellProcess.addCommand("dir");
                 break;
             case SOLARIS:
             case BSD:
             case AIX:
             case LINUX:
-                shellProcess.writeCommand("ls -l /");
+                shellProcess.addCommand("ls -l /");
                 break;
         }
         shellProcess.close();
@@ -43,7 +43,7 @@ public class ShellProcessTest {
         ShellProcess shellProcess = ShellProcess.open();
         assertNotNull(shellProcess);
         shellProcess.setSafeExit(true);
-        shellProcess.writeCommand("exit 80");
+        shellProcess.addCommand("exit 80");
         shellProcess.close();
         assertEquals(80, shellProcess.getExitCode());
     }
