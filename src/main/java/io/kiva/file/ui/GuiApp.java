@@ -16,10 +16,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuBar;
+import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
@@ -60,17 +57,21 @@ public class GuiApp extends FxApplication implements OnCacheUpdatedListener, Eve
 
     private void initMenu(MenuBar menuBar) {
         ObservableList<Menu> menus = menuBar.getMenus();
-        Menu refresh = new Menu("Refresh");
-        refresh.addEventHandler(EventType.ROOT, event -> {
-            mNavigator.navigate(mNavigator.getCurrentPath());
-        });
+        Menu fileMenu = new Menu("File");
+        MenuItem gotoItem = new MenuItem("Goto");
+        MenuItem refreshItem = new MenuItem("Refresh");
 
-        Menu navigateTo = new Menu("Goto");
-        navigateTo.addEventHandler(EventType.ROOT, event -> {
-            // TODO: Navigate to someplace
+        gotoItem.setOnAction(event -> {
+            TextInputDialog dialog = new TextInputDialog(mNavigator.getCurrentPath());
+            dialog.setTitle("Input New Path");
+            dialog.setHeaderText("Input where you want to go");
+            dialog.setContentText("Absolute Path: ");
+            dialog.showAndWait().ifPresent(mNavigator::navigate);
         });
-        menus.add(refresh);
-        menus.add(navigateTo);
+        refreshItem.setOnAction(event -> mNavigator.navigate(mNavigator.getCurrentPath()));
+
+        fileMenu.getItems().addAll(refreshItem, gotoItem);
+        menus.add(fileMenu);
     }
 
     @Override
