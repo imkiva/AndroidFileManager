@@ -1,6 +1,8 @@
 package io.kiva.file.ui.cell;
 
 import io.kiva.file.core.model.FileModel;
+import io.kiva.fx.FxApplication;
+import javafx.scene.image.Image;
 
 /**
  * @author kiva
@@ -15,5 +17,20 @@ public class CellHelper {
                 break;
         }
         return builder.toString();
+    }
+
+    public static Image buildIconFor(FxApplication app, FileModel model) {
+        switch (model.getFileType()) {
+            case DIRECTORY:
+                return app.loadImage("file_type_dir.png");
+            case SYMBOL_LINK: {
+                FileModel target = model.getSymbolLinkTarget();
+                if (target != null && target.isDirectory()) {
+                    return app.loadImage("file_type_dir.png");
+                }
+            }
+            default:
+                return app.loadImage("file_type_unknown.png");
+        }
     }
 }

@@ -134,7 +134,6 @@ public class GuiApp extends FxApplication implements OnCacheUpdatedListener, Eve
             }
             if (cachedPath != null) {
                 List<FileModel> cachedModels = mManager.getCachedFileList(cachedPath);
-                Log.d("Checking cache for " + cachedPath);
                 if (cachedModels.size() > 0) {
                     Log.d("Hit cache: " + cachedPath);
                 }

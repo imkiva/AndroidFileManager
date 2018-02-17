@@ -29,10 +29,7 @@ public class FileCell extends ListCell<FileViewModel> {
         Text text = new Text();
         text.setTextAlignment(TextAlignment.LEFT);
         text.setText(CellHelper.buildLabelFor(model));
-
-        Image image = model.isDirectory()
-                ? mApplication.loadImage("file_type_dir.png")
-                : mApplication.loadImage("file_type_unknown.png");
+        Image image = CellHelper.buildIconFor(mApplication, model);
 
         ImageView imageView = new ImageView(image);
 
