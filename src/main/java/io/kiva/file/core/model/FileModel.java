@@ -59,4 +59,8 @@ public class FileModel {
     public String toString() {
         return mParseResult.toString();
     }
+
+    void setSymbolLinkTarget(FileModel mSymbolLinkTarget) {
+        this.mSymbolLinkTarget = mSymbolLinkTarget;
+    }
 }

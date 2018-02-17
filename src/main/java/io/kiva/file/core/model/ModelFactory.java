@@ -49,4 +49,8 @@ public class ModelFactory {
         }
         return model;
     }
+
+    public void setSymbolLinkTarget(FileModel model, FileModel target) {
+        model.setSymbolLinkTarget(target);
+    }
 }

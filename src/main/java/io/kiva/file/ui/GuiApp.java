@@ -4,6 +4,7 @@ import io.kiva.file.core.DirectoryNavigator;
 import io.kiva.file.core.FileManager;
 import io.kiva.file.core.OnCacheUpdatedListener;
 import io.kiva.file.core.model.FileModel;
+import io.kiva.file.core.parser.FileType;
 import io.kiva.file.core.utils.FileHelper;
 import io.kiva.file.core.utils.Log;
 import io.kiva.file.ui.cell.FileCell;
@@ -121,15 +122,17 @@ public class GuiApp extends FxApplication implements OnCacheUpdatedListener, Eve
             return;
         }
 
+        FileModel fileModel = model.getFileModel();
+
         // Apply caches first.
         // Replace them in onCacheUpdated()
         synchronized (this) {
             String cachedPath = null;
             if (model instanceof TopDirModel) {
                 cachedPath = mNavigator.getParentPath();
-            } else if (model.getFileModel().isDirectory()) {
+            } else if (fileModel.isDirectory()) {
                 cachedPath = mNavigator.getCurrentPath()
-                        + model.getFileModel().getName()
+                        + fileModel.getName()
                         + File.separator;
             }
             if (cachedPath != null) {
@@ -146,8 +149,14 @@ public class GuiApp extends FxApplication implements OnCacheUpdatedListener, Eve
         if (model instanceof TopDirModel) {
             mNavigator.navigateTop();
 
-        } else if (model.getFileModel().isDirectory()) {
-            mNavigator.navigateInto(model.getFileModel().getName());
+        } else if (fileModel.isDirectory()) {
+            mNavigator.navigateInto(fileModel.getName());
+
+        } else if (fileModel.getFileType() == FileType.SYMBOL_LINK){
+            FileModel target = fileModel.getSymbolLinkTarget();
+            if (target != null) {
+                mNavigator.navigateInto(target.getName());
+            }
         }
     }
 }

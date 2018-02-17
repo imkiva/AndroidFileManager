@@ -27,6 +27,10 @@ final class DirectoryCache {
         cache.addAll(updated);
     }
 
+    boolean contains(String path) {
+        return mCache.containsKey(path);
+    }
+
     List<FileModel> get(String path) {
         return getInternal(path);
     }

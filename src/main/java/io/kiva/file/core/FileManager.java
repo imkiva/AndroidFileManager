@@ -2,12 +2,14 @@ package io.kiva.file.core;
 
 import io.kiva.file.core.model.FileModel;
 import io.kiva.file.core.model.ModelFactory;
+import io.kiva.file.core.parser.FileType;
 import io.kiva.file.core.utils.FileHelper;
 import io.kiva.file.core.utils.Log;
 import io.kiva.process.IOutputListener;
 import io.kiva.process.ProcessOutput;
 import io.kiva.process.ShellProcess;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -88,6 +90,7 @@ public class FileManager implements OnDirectoryChangedListener, IOutputListener 
     public void onNewOutput(ProcessOutput output) {
         if (output.getLine().equals(COMMAND_END)) {
             Log.d("Cache for " + mLoadingPath + " updated");
+            resolveSymbolLink(mLoading);
             mLoading.sort(COMPARATOR);
             mCache.update(mLoadingPath, mLoading);
             notifyChangeUpdated(mLoadingPath, mLoading);
@@ -108,5 +111,31 @@ public class FileManager implements OnDirectoryChangedListener, IOutputListener 
 
     public void dispose() {
         mShell.close();
+    }
+
+    private void resolveSymbolLink(ArrayList<FileModel> fileModels) {
+        fileModels.parallelStream()
+                .filter(model -> model.getFileType() == FileType.SYMBOL_LINK)
+                .forEach(model -> {
+                    String targetName = model.getSymbolLinkName();
+
+                    // target is in the same dir as symbol link file
+                    if (!targetName.contains(File.separator)) {
+                        FACTORY.setSymbolLinkTarget(model, findTarget(fileModels, targetName));
+                        return;
+                    }
+
+                    String whereTarget = FileHelper.dirName(targetName);
+                    String targetBaseName = FileHelper.baseName(targetName);
+                    FACTORY.setSymbolLinkTarget(model,
+                            findTarget(mCache.get(whereTarget), targetBaseName));
+                });
+    }
+
+    private FileModel findTarget(List<FileModel> fileModels, String targetName) {
+        return fileModels.stream()
+                .filter(model -> model.getName().equals(targetName))
+                .findFirst()
+                .orElse(null);
     }
 }

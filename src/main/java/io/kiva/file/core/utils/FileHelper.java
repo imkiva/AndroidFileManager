@@ -25,6 +25,14 @@ public final class FileHelper {
         return ADB_SHELL_PREFIX + " echo " + escapeParameter(signal);
     }
 
+    public static String dirName(String fileName) {
+        return new File(fileName).getParent();
+    }
+
+    public static String baseName(String fileName) {
+        return new File(fileName).getName();
+    }
+
     public static boolean isRootDirectory(String dir) {
         return dir.trim().equals(File.separator);
     }
