@@ -35,6 +35,11 @@ public class GuiApp extends FxApplication implements FileManagerCallback, EventH
     private FileManager mManager;
     private DirectoryNavigator mNavigator;
     private ContextMenu mItemContextMenu;
+    private UserConfig mUserConfig;
+
+    public GuiApp() {
+        mUserConfig = new UserConfig(GuiApp.class);
+    }
 
     @SuppressWarnings("unchecked")
     @Override
@@ -58,6 +63,7 @@ public class GuiApp extends FxApplication implements FileManagerCallback, EventH
     private void initMenu(MenuBar menuBar) {
         ObservableList<Menu> menus = menuBar.getMenus();
         Menu fileMenu = new Menu("File");
+        Menu adbMenu = new Menu("ADB");
 
         MenuItem gotoItem = new MenuItem("_Goto");
         MenuItem refreshItem = new MenuItem("_Refresh");
@@ -88,7 +94,11 @@ public class GuiApp extends FxApplication implements FileManagerCallback, EventH
 
         fileMenu.getItems().addAll(newItem, new SeparatorMenuItem(), refreshItem, gotoItem);
 
-        menus.addAll(fileMenu);
+        MenuItem setAdbPath = new MenuItem("Select ADB Executable");
+        setAdbPath.setOnAction(event -> handleSelectAdb());
+        adbMenu.getItems().addAll(setAdbPath);
+
+        menus.addAll(fileMenu, adbMenu);
 
         MenuItem delete = new MenuItem("_Delete");
         delete.setMnemonicParsing(true);
@@ -109,6 +119,8 @@ public class GuiApp extends FxApplication implements FileManagerCallback, EventH
             Log.d("Cache for" + path + " updated, but current path is " + mNavigator.getCurrentPath());
             return;
         }
+
+        mUserConfig.setLastPath(path);
         Platform.runLater(() -> {
             List<FileViewModel> models = mapToViewModel(path, newCache);
             synchronized (this) {
@@ -158,7 +170,7 @@ public class GuiApp extends FxApplication implements FileManagerCallback, EventH
         mNavigator = mManager.getNavigator();
 
         List<String> args = getParameters().getRaw();
-        mNavigator.navigate(args.isEmpty() ? "/" : args.get(0));
+        mNavigator.navigate(args.isEmpty() ? mUserConfig.getLastPath().orElse("/") : args.get(0));
     }
 
     private void handleDelete(FileViewModel model) {
@@ -219,6 +231,10 @@ public class GuiApp extends FxApplication implements FileManagerCallback, EventH
                 mNavigator.navigateInto(target.getName());
             }
         }
+    }
+
+    private void handleSelectAdb() {
+
     }
 
     @Override
