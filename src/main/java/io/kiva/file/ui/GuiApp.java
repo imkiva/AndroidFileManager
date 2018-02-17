@@ -64,7 +64,7 @@ public class GuiApp extends FxApplication implements OnCacheUpdatedListener, Eve
         gotoItem.setOnAction(event -> {
             TextInputDialog dialog = new TextInputDialog(mNavigator.getCurrentPath());
             dialog.setTitle("Input New Path");
-            dialog.setHeaderText("Input where you want to go");
+            dialog.setHeaderText("Where you want to go?");
             dialog.setContentText("Absolute Path: ");
             dialog.showAndWait().ifPresent(mNavigator::navigate);
         });
@@ -82,9 +82,14 @@ public class GuiApp extends FxApplication implements OnCacheUpdatedListener, Eve
 
     @Override
     public void onCacheUpdated(String path, List<FileModel> newCache) {
+        if (!mNavigator.getCurrentPath().equals(path)) {
+            Log.d("Cache for" + path + " updated, but current path is " + mNavigator.getCurrentPath());
+            return;
+        }
         Platform.runLater(() -> {
             List<FileViewModel> models = mapToViewModel(path, newCache);
             synchronized (this) {
+                setTitle(path);
                 mListView.setItems(FXCollections.observableArrayList(models));
             }
         });

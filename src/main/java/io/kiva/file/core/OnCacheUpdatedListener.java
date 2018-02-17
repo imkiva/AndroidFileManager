@@ -8,6 +8,7 @@ import java.util.List;
  * @author kiva
  * @date 2018/2/16
  */
+@FunctionalInterface
 public interface OnCacheUpdatedListener {
     void onCacheUpdated(String path, List<FileModel> newCache);
 }

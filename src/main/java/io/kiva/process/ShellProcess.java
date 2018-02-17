@@ -34,7 +34,9 @@ public class ShellProcess implements AutoCloseable, IOutputListener {
         if (mClosed) {
             throw new ShellClosedException();
         }
-        mCommandWriter.addCommand(command);
+        mCommandWriter.addCommand(command
+                + ";"
+                + ShellHelper.buildFinishCommand(ProcessOutput.END_COMMAND_FLAG));
     }
 
     private void doSafeExit() {

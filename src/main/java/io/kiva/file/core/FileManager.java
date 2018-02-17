@@ -7,6 +7,7 @@ import io.kiva.file.core.utils.FileHelper;
 import io.kiva.file.core.utils.Log;
 import io.kiva.process.IOutputListener;
 import io.kiva.process.ProcessOutput;
+import io.kiva.process.ShellHelper;
 import io.kiva.process.ShellProcess;
 
 import java.io.File;
@@ -19,7 +20,6 @@ import java.util.List;
  * @date 2018/2/14
  */
 public class FileManager implements OnDirectoryChangedListener, IOutputListener {
-    private static final String COMMAND_END = "----AFM---COMMAND-END----";
     private static final ModelFactory FACTORY = ModelFactory.create();
     private static final Comparator<FileModel> COMPARATOR = (lhs, rhs) -> {
         boolean lhsIsDir = lhs.isDirectory();
@@ -81,14 +81,12 @@ public class FileManager implements OnDirectoryChangedListener, IOutputListener 
         Log.d("Updating cache for " + newPath);
         mLoading = new ArrayList<>();
         mLoadingPath = newPath;
-        mShell.writeCommand(FileHelper.buildAndroidListCommand(newPath)
-                + ";"
-                + FileHelper.buildAndroidFinishCommand(COMMAND_END));
+        mShell.writeCommand(FileHelper.buildAndroidListCommand(newPath));
     }
 
     @Override
     public void onNewOutput(ProcessOutput output) {
-        if (output.getLine().equals(COMMAND_END)) {
+        if (output.isFinishFlag()) {
             Log.d("Cache for " + mLoadingPath + " updated");
             resolveSymbolLink(mLoading);
             mLoading.sort(COMPARATOR);
