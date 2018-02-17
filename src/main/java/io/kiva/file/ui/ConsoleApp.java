@@ -17,7 +17,7 @@ import java.util.Locale;
  * @author kiva
  * @date 2018/2/16
  */
-public class ConsoleApp implements OnCacheUpdatedListener {
+final class ConsoleApp implements OnCacheUpdatedListener {
     private final FileManager mManager;
     private final DirectoryNavigator mNavigator;
 

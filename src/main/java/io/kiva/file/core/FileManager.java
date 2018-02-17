@@ -82,7 +82,6 @@ public class FileManager implements OnDirectoryChangedListener, IOutputListener 
 
     @Override
     public void onNewOutput(ProcessOutput output) {
-        Log.i("-> " + output.getLine());
         if (output.getLine().equals(COMMAND_END)) {
             Log.d("Cache for " + mLoadingPath + " updated");
             mLoading.sort(COMPARATOR);
