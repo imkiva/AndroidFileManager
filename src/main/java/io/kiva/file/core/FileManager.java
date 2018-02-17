@@ -23,8 +23,8 @@ import java.util.List;
  * @date 2018/2/14
  */
 public class FileManager implements OnDirectoryChangedListener, IOutputListener {
-
     private static final ModelFactory FACTORY = ModelFactory.create();
+
     private static final Comparator<FileModel> COMPARATOR = (lhs, rhs) -> {
         boolean lhsIsDir = lhs.isDirectory();
         boolean rhsIsDir = rhs.isDirectory();

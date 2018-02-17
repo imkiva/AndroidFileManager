@@ -3,6 +3,7 @@ package io.kiva.file.ui;
 import io.kiva.file.core.DirectoryNavigator;
 import io.kiva.file.core.FileManager;
 import io.kiva.file.core.FileManagerCallback;
+import io.kiva.file.core.command.CommandHelper;
 import io.kiva.file.core.model.FileModel;
 import io.kiva.file.core.parser.FileType;
 import io.kiva.file.core.utils.FileHelper;
@@ -18,6 +19,7 @@ import javafx.event.EventHandler;
 import javafx.scene.control.*;
 import javafx.scene.input.*;
 import javafx.scene.layout.BorderPane;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import java.io.File;
@@ -169,8 +171,15 @@ public class GuiApp extends FxApplication implements FileManagerCallback, EventH
         mManager.addOnCacheUpdatedListener(this);
         mNavigator = mManager.getNavigator();
 
+        mUserConfig.getAdbPath().ifPresent(this::applyAdbPath);
         List<String> args = getParameters().getRaw();
         mNavigator.navigate(args.isEmpty() ? mUserConfig.getLastPath().orElse("/") : args.get(0));
+    }
+
+    private void applyAdbPath(String adbPath) {
+        Log.d("Apply ADB: " + adbPath);
+        mUserConfig.setAdbPath(adbPath);
+        CommandHelper.setAdbPath(adbPath);
     }
 
     private void handleDelete(FileViewModel model) {
@@ -234,7 +243,12 @@ public class GuiApp extends FxApplication implements FileManagerCallback, EventH
     }
 
     private void handleSelectAdb() {
-
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Select ADB Executable");
+        File adbFile = fileChooser.showOpenDialog(getPrimaryStage());
+        if (adbFile != null) {
+            applyAdbPath(adbFile.getAbsolutePath());
+        }
     }
 
     @Override
