@@ -94,7 +94,7 @@ public class GuiApp extends FxApplication implements FileManagerCallback, EventH
         delete.setMnemonicParsing(true);
         delete.setAccelerator(new KeyCodeCombination(KeyCode.D, KeyCombination.SHORTCUT_DOWN));
         delete.setOnAction(event -> handleDelete(mListView.getSelectionModel().getSelectedItem()));
-        mItemContextMenu = new ContextMenu(delete);
+        mItemContextMenu = new ContextMenu(newItem, delete, refreshItem, new SeparatorMenuItem(), gotoItem);
     }
 
     @Override
