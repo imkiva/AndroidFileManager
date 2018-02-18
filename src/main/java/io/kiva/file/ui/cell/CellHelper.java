@@ -25,7 +25,7 @@ public class CellHelper {
                 return app.loadImage("file_type_dir.png");
             case SYMBOL_LINK: {
                 FileModel target = model.getSymbolLinkTarget();
-                if (target != null && target.isDirectory()) {
+                if (target != null && target.isEffectivelyDirectory()) {
                     return app.loadImage("file_type_dir.png");
                 }
             }

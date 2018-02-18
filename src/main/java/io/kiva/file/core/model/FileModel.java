@@ -11,6 +11,17 @@ public class FileModel {
     private ParseResult mParseResult;
     private FileModel mSymbolLinkTarget;
 
+    public boolean isEffectivelyDirectory() {
+        if (isDirectory()) {
+            return true;
+
+        } else if (getFileType() == FileType.SYMBOL_LINK) {
+            FileModel target = getSymbolLinkTarget();
+            return target != null && target.isEffectivelyDirectory();
+        }
+        return false;
+    }
+
     public FileModel getSymbolLinkTarget() {
         return mSymbolLinkTarget;
     }

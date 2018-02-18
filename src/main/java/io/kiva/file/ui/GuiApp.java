@@ -5,7 +5,6 @@ import io.kiva.file.core.FileManager;
 import io.kiva.file.core.FileManagerCallback;
 import io.kiva.file.core.command.CommandHelper;
 import io.kiva.file.core.model.FileModel;
-import io.kiva.file.core.parser.FileType;
 import io.kiva.file.core.utils.FileHelper;
 import io.kiva.file.core.utils.Log;
 import io.kiva.file.ui.cell.FileCell;
@@ -15,7 +14,6 @@ import io.kiva.fx.FxApplication;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.EventHandler;
 import javafx.scene.control.*;
 import javafx.scene.input.*;
 import javafx.scene.layout.BorderPane;
@@ -31,7 +29,7 @@ import java.util.stream.Collectors;
  * @author kiva
  * @date 2018/2/16
  */
-public class GuiApp extends FxApplication implements FileManagerCallback, EventHandler<MouseEvent> {
+public class GuiApp extends FxApplication implements FileManagerCallback {
     private ListView<FileViewModel> mListView;
 
     private FileManager mManager;
@@ -161,8 +159,10 @@ public class GuiApp extends FxApplication implements FileManagerCallback, EventH
 
     private ListCell<FileViewModel> onCreateListCell(ListView<FileViewModel> listView) {
         FileCell fileCell = new FileCell(this);
-        fileCell.setOnMouseClicked(this);
         fileCell.setContextMenu(mItemContextMenu);
+        fileCell.setOnMouseClicked(this::handleMouseClick);
+        fileCell.setOnDragOver(this::handleDragOver);
+        fileCell.setOnDragDropped(this::handleDragDropped);
         return fileCell;
     }
 
@@ -180,6 +180,29 @@ public class GuiApp extends FxApplication implements FileManagerCallback, EventH
         Log.d("Apply ADB: " + adbPath);
         mUserConfig.setAdbPath(adbPath);
         CommandHelper.setAdbPath(adbPath);
+    }
+
+    private void handleDragOver(DragEvent event) {
+        event.acceptTransferModes(TransferMode.COPY);
+    }
+
+    private void handleDragDropped(DragEvent event) {
+        FileCell fileCell = (FileCell) event.getGestureTarget();
+        FileViewModel viewModel = fileCell.getItem();
+
+        String targetDirectory;
+        if (viewModel == null) {
+            targetDirectory = mNavigator.getCurrentPath();
+        } else {
+            FileModel fileModel = viewModel.getFileModel();
+            targetDirectory = viewModel.getFileModel().getName();
+        }
+
+        Dragboard dragboard = event.getDragboard();
+        dragboard.getFiles().forEach(it -> Log.d("======> Sending "
+                + it.getAbsolutePath()
+                + " to "
+                + targetDirectory));
     }
 
     private void handleDelete(FileViewModel model) {
@@ -231,14 +254,8 @@ public class GuiApp extends FxApplication implements FileManagerCallback, EventH
         if (model instanceof TopDirModel) {
             mNavigator.navigateTop();
 
-        } else if (fileModel.isDirectory()) {
+        } else if (fileModel.isEffectivelyDirectory()) {
             mNavigator.navigateInto(fileModel.getName());
-
-        } else if (fileModel.getFileType() == FileType.SYMBOL_LINK) {
-            FileModel target = fileModel.getSymbolLinkTarget();
-            if (target != null) {
-                mNavigator.navigateInto(target.getName());
-            }
         }
     }
 
@@ -251,8 +268,7 @@ public class GuiApp extends FxApplication implements FileManagerCallback, EventH
         }
     }
 
-    @Override
-    public void handle(MouseEvent event) {
+    public void handleMouseClick(MouseEvent event) {
         if (event.getButton() == MouseButton.PRIMARY
                 && event.getClickCount() >= 2) {
             FileViewModel model = mListView.getSelectionModel().getSelectedItem();
