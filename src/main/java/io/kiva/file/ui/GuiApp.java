@@ -214,7 +214,10 @@ public class GuiApp extends FxApplication implements FileManagerCallback {
         Alert dialog = new Alert(Alert.AlertType.CONFIRMATION);
         dialog.setTitle("Delete");
         dialog.setHeaderText(fileModel.getName());
-        dialog.setContentText("This is unrecoverable.\nAre you sure?");
+        dialog.setContentText("This is unrecoverable.\nAre you sure?\n\n" +
+                "Delete command: \n"
+                + CommandHelper.deleteCommand(mNavigator.getCurrentPath()
+                + fileModel.getName()));
 
         dialog.showAndWait().ifPresent(r -> {
             if (r == ButtonType.OK) {
