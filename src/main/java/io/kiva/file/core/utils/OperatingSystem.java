@@ -18,19 +18,19 @@ public enum OperatingSystem {
     public static OperatingSystem get() {
         String osName = SystemProperty.get("os.name");
 
-        if (osName.equals("Linux")) {
+        if (osName.contains("Linux")) {
             return LINUX;
         }
         if (osName.contains("OS X")) {
             return BSD;
         }
-        if (osName.equals("SunOS")) {
+        if (osName.contains("SunOS")) {
             return SOLARIS;
         }
-        if (osName.equals("AIX")) {
+        if (osName.contains("AIX")) {
             return AIX;
         }
-        if (osName.equals("Windows")) {
+        if (osName.contains("Windows")) {
             return WINDOWS;
         }
 
