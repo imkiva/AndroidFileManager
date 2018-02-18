@@ -14,4 +14,6 @@ public interface FileManagerCallback {
     void onDirectoryCreated(String dir);
 
     void onFileDeleted(String path);
+
+    void onAllFilesPushed(String targetDirectory);
 }

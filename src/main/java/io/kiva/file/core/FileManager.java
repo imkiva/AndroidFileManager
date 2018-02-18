@@ -3,6 +3,7 @@ package io.kiva.file.core;
 import io.kiva.file.core.command.CreateDirectoryCommand;
 import io.kiva.file.core.command.DeleteCommand;
 import io.kiva.file.core.command.LsCommand;
+import io.kiva.file.core.command.PushFileCommand;
 import io.kiva.file.core.model.FileModel;
 import io.kiva.file.core.model.ModelFactory;
 import io.kiva.file.core.parser.FileType;
@@ -15,6 +16,7 @@ import io.kiva.process.ShellProcess;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
@@ -57,6 +59,10 @@ public class FileManager implements OnDirectoryChangedListener, IOutputListener 
         mDirectoryNavigator.addOnDirectoryChangedListener(this);
     }
 
+    public void dispose() {
+        mShell.close();
+    }
+
     public DirectoryNavigator getNavigator() {
         return mDirectoryNavigator;
     }
@@ -80,14 +86,6 @@ public class FileManager implements OnDirectoryChangedListener, IOutputListener 
         this.mListeners.remove(listener);
     }
 
-    @Override
-    public void onDirectoryChanged(String newPath) {
-        Log.d("Updating cache for " + newPath);
-        mLoadingPath = newPath;
-        mLoadingModels = new ArrayList<>();
-        mShell.addCommand(new LsCommand(newPath));
-    }
-
     public void createDirectory(String dirName) {
         createDirectory(mDirectoryNavigator.getCurrentPath(), dirName);
     }
@@ -104,6 +102,30 @@ public class FileManager implements OnDirectoryChangedListener, IOutputListener 
     public void deleteRecursively(String parentPath, String name) {
         File file = new File(parentPath, name);
         mShell.addCommand(new DeleteCommand(file.getAbsolutePath()));
+    }
+
+    public void pushFiles(File... files) {
+        pushFiles(Arrays.asList(files));
+    }
+
+    public void pushFiles(String targetDirectory, File... files) {
+        pushFiles(targetDirectory, Arrays.asList(files));
+    }
+
+    public void pushFiles(List<File> files) {
+        pushFiles(mDirectoryNavigator.getCurrentPath(), files);
+    }
+
+    public void pushFiles(String targetDirectory, List<File> files) {
+        mShell.addCommand(new PushFileCommand(targetDirectory, files));
+    }
+
+    @Override
+    public void onDirectoryChanged(String newPath) {
+        Log.d("Updating cache for " + newPath);
+        mLoadingPath = newPath;
+        mLoadingModels = new ArrayList<>();
+        mShell.addCommand(new LsCommand(newPath));
     }
 
     @Override
@@ -136,8 +158,13 @@ public class FileManager implements OnDirectoryChangedListener, IOutputListener 
 
         if (line.startsWith(DeleteCommand.SIGNAL)) {
             String path = line.substring(DeleteCommand.SIGNAL.length());
-            notifyDirectoryCreated(path);
+            notifyFileDeleted(path);
             return;
+        }
+
+        if (line.startsWith(PushFileCommand.SIGNAL)) {
+            String targetDirectory = line.substring(PushFileCommand.SIGNAL.length());
+            notifyAllFilesPushed(targetDirectory);
         }
     }
 
@@ -153,8 +180,8 @@ public class FileManager implements OnDirectoryChangedListener, IOutputListener 
         mListeners.forEach(listener -> listener.onFileDeleted(path));
     }
 
-    public void dispose() {
-        mShell.close();
+    private void notifyAllFilesPushed(String targetDirectory) {
+        mListeners.forEach(listener -> listener.onAllFilesPushed(targetDirectory));
     }
 
     private void resolveSymbolLink(ArrayList<FileModel> fileModels) {

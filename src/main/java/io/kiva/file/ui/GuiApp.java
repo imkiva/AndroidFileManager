@@ -132,13 +132,19 @@ public class GuiApp extends FxApplication implements FileManagerCallback {
 
     @Override
     public void onDirectoryCreated(String dir) {
-        Log.d("Directory created: " + dir);
+        Log.d("<<<<<< Directory created: " + dir);
         refresh();
     }
 
     @Override
     public void onFileDeleted(String path) {
-        Log.d("File deleted: " + path);
+        Log.d("<<<<<< File deleted: " + path);
+        refresh();
+    }
+
+    @Override
+    public void onAllFilesPushed(String targetDirectory) {
+        Log.d("<<<<<< All files are pushed to: " + targetDirectory);
         refresh();
     }
 
@@ -205,12 +211,13 @@ public class GuiApp extends FxApplication implements FileManagerCallback {
         Dragboard dragboard = event.getDragboard();
         List<File> draggedFiles = dragboard.getFiles();
         if (draggedFiles.size() > 0) {
-            Log.d("======> Pushing "
+            Log.d(">>>>>> Push "
                     + draggedFiles.stream()
                     .map(File::getAbsolutePath)
                     .collect(Collectors.joining(" "))
                     + " to "
                     + targetDirectory);
+            mManager.pushFiles(draggedFiles);
         }
     }
 
@@ -230,6 +237,7 @@ public class GuiApp extends FxApplication implements FileManagerCallback {
 
         dialog.showAndWait().ifPresent(r -> {
             if (r == ButtonType.OK) {
+                Log.d(">>>>>> Delete " + fileModel.getName());
                 mManager.deleteRecursively(fileModel.getName());
             }
         });

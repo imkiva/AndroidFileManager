@@ -3,8 +3,8 @@ package io.kiva.file.core.command;
 import io.kiva.process.ShellHelper;
 
 import java.io.File;
+import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * @author kiva
@@ -23,9 +23,9 @@ public final class CommandHelper {
         ADB_SHELL_PREFIX = ADB_PATH + " shell ";
     }
 
-    public static String pushCommand(String targetDirectory, File... files) {
+    public static String pushCommand(String targetDirectory, List<File> files) {
         StringBuilder builder = new StringBuilder(ADB_PATH).append(" push ");
-        String fileList = Stream.of(files)
+        String fileList = files.stream()
                 .map(File::getAbsolutePath)
                 .map(ShellHelper::escapeParameter)
                 .collect(Collectors.joining(" "));
