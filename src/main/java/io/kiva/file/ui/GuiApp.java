@@ -195,14 +195,23 @@ public class GuiApp extends FxApplication implements FileManagerCallback {
             targetDirectory = mNavigator.getCurrentPath();
         } else {
             FileModel fileModel = viewModel.getFileModel();
-            targetDirectory = viewModel.getFileModel().getName();
+            if (fileModel.isEffectivelyDirectory()) {
+                targetDirectory = viewModel.getFileModel().getName();
+            } else {
+                targetDirectory = mNavigator.getCurrentPath();
+            }
         }
 
         Dragboard dragboard = event.getDragboard();
-        dragboard.getFiles().forEach(it -> Log.d("======> Sending "
-                + it.getAbsolutePath()
-                + " to "
-                + targetDirectory));
+        List<File> draggedFiles = dragboard.getFiles();
+        if (draggedFiles.size() > 0) {
+            Log.d("======> Pushing "
+                    + draggedFiles.stream()
+                    .map(File::getAbsolutePath)
+                    .collect(Collectors.joining(" "))
+                    + " to "
+                    + targetDirectory);
+        }
     }
 
     private void handleDelete(FileViewModel model) {

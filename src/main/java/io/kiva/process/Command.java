@@ -41,4 +41,9 @@ public class Command {
     public static boolean isSignal(String line) {
         return line.startsWith(SIGNAL_PREFIX);
     }
+
+    @Override
+    public String toString() {
+        return getCommand();
+    }
 }
